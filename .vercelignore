@@ -1,5 +1,7 @@
-# Reference-only / broken binaries — never shipped in the deployment.
-# See README.md for details on why each is excluded.
+# Reference-only / unused binaries — not shipped in the deployment bundle.
+# None of these are broken; see README.md. scene1-ivory.mp4 IS used by the
+# site, but is fetched at runtime via its GitHub raw URL, so it doesn't need
+# to be duplicated into every Vercel deployment either.
 alzuman-bar.glb
 alzuman-bar-999.glb
 scene1-ivory.mp4
