@@ -97,10 +97,9 @@
   mobileMenu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeMenu); });
 
   /* ============ video autoplay (native timing — never seeked by scroll) ============ */
-  var videoA = document.getElementById('videoA');
-  var videoB = document.getElementById('videoB');
+  var heroVideo = document.getElementById('heroVideo');
   var videoC = document.getElementById('videoC');
-  [videoA, videoB, videoC].forEach(function(v){ v.play().catch(function(){}); });
+  [heroVideo, videoC].forEach(function(v){ v.play().catch(function(){}); });
 
   /* ============ reduced motion: static fallback ============ */
   if (reduceMotion || !window.gsap || !window.ScrollTrigger){
@@ -108,9 +107,6 @@
     siteHeader.style.backdropFilter = 'blur(10px)';
     document.getElementById('headerWordmark').style.opacity = 1;
     document.getElementById('headerWordmark').style.transform = 'translateY(0)';
-    document.getElementById('goldFrame').style.opacity = 1;
-    document.getElementById('goldLayerA').style.opacity = 1;
-    document.getElementById('goldLayerB').style.opacity = 0;
     ['arrivalPhrase','megaNumber','megaCaption','valuePrice'].forEach(function(id){
       document.getElementById(id).style.opacity = 1;
     });
@@ -129,13 +125,8 @@
 
   var brandMark = document.getElementById('brandMark');
   var scrollInvite = document.getElementById('scrollInvite');
-  var scrollPeek = document.getElementById('scrollPeek');
   var brandLogo = document.getElementById('brandLogo');
   var headerWordmark = document.getElementById('headerWordmark');
-  var goldFrame = document.getElementById('goldFrame');
-  var goldLayerA = document.getElementById('goldLayerA');
-  var goldLayerB = document.getElementById('goldLayerB');
-  var transitionFlash = document.getElementById('transitionFlash');
   var arrivalWords = document.querySelectorAll('#arrivalPhrase .aw i');
   var megaNumber = document.getElementById('megaNumber');
   var megaDigits = document.querySelectorAll('#megaNumber .mn-d');
@@ -162,22 +153,8 @@
   var BRAND_END = 0.20;
   var ARRIVAL_END = 0.467;
   var MAT_A_END = 0.60;
-  var CROSS_END = 0.62;
-  var MACRO_START = 0.66;
-  var MACRO_PEAK = 0.70;
-  var MACRO_END = 0.735;
   var MAT_END = 0.75;
   var VALUE_END = 1.0;
-
-  // the bullion frame's width in vw, and its horizontal drift, as one continuous
-  // curve across the whole act — clamped well inside the 30-48vw brief limit,
-  // with exactly one deliberate macro moment that immediately restores scale after.
-  var GOLD_WIDTH_KF = [
-    [0, 0], [BRAND_END, 0], [BRAND_END + 0.05, 9], [ARRIVAL_END, 34],
-    [MAT_A_END, 36], [CROSS_END, 36], [MACRO_START, 38],
-    [MACRO_PEAK, 54], [MACRO_END, 40], [MAT_END, 40], [VALUE_END, 33]
-  ];
-  var GOLD_X_KF = [[0, 0], [MAT_END, 0], [VALUE_END, -15]];
 
   /* ============ ACT I master scrub: Brand -> Arrival -> Material -> Value ============ */
   ScrollTrigger.create({
@@ -196,10 +173,9 @@
   gsap.to(brandLogo, {opacity:1, scale:1, duration:0.95, ease:'power3.out', delay:0.1});
 
   function renderAct(p){
-    // scroll cues fade once the visitor actually starts scrolling
+    // scroll cue fades once the visitor actually starts scrolling
     var cueOpacity = 1 - mapRange(p, 0.035, 0.09);
     scrollInvite.style.opacity = cueOpacity;
-    scrollPeek.style.opacity = cueOpacity;
 
     // ARRIVAL: whole brand mark migrates toward header (continuous scale + position,
     // never an abrupt swap), header solidifies smoothly, phrase rises
@@ -223,23 +199,6 @@
       var eased = ease('power4.out', wt);
       word.style.transform = 'translateY(' + (105 - eased * 105) + '%)';
     });
-
-    // GOLD FRAME: one continuous width/position curve — small window, soft-masked
-    // edges, one deliberate macro close-up that immediately restores comfortable scale
-    var frameW = kf(p, GOLD_WIDTH_KF);
-    var frameX = kf(p, GOLD_X_KF);
-    goldFrame.style.width = frameW + 'vw';
-    goldFrame.style.transform = 'translate(calc(-50% + ' + frameX + 'vw), -50%)';
-    goldFrame.style.opacity = mapRange(p, BRAND_END + 0.02, BRAND_END + 0.12);
-
-    // crossfade between the two clips behind a brief gold-reflection flash
-    var crossT = mapRange(p, MAT_A_END, CROSS_END);
-    goldLayerA.style.opacity = 1 - crossT;
-    goldLayerB.style.opacity = crossT;
-    transitionFlash.style.opacity = (1 - Math.abs(crossT * 2 - 1)) * (crossT > 0 && crossT < 1 ? 0.9 : 0);
-
-    // gold is allowed in front of the number for the heart of this scene, then recedes
-    goldFrame.style.zIndex = (p > MAT_A_END + 0.06 && p < MAT_END - 0.05) ? 4 : 2;
 
     var megaIn = mapRange(p, MAT_A_END, MAT_A_END + 0.06);
     megaDigits.forEach(function(d, i){
