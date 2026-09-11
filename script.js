@@ -6,27 +6,40 @@
 
   /* ============ 2) BAR WINDOW: fixed-pixel scroll trigger ============ */
   var hero = document.getElementById('hero');
+  var barScene = document.getElementById('bar-scene');
   var barFrame = document.getElementById('barFrame');
-  var goldBarVideo = document.getElementById('goldBarVideo');
+  var goldBar = document.getElementById('goldBar');
 
   var heroHeight = hero.offsetHeight;
+  var barSceneTop = barScene.offsetTop;
+  var barSceneHeight = barScene.offsetHeight;
 
   window.addEventListener('resize', function(){
     heroHeight = hero.offsetHeight;
+    barSceneTop = barScene.offsetTop;
+    barSceneHeight = barScene.offsetHeight;
   });
 
   var OPEN_RATIO = 0.6; // open once we've scrolled 60% of the hero's height
 
-  /* ============ lazy-load + play the gold bar video once the frame opens ============ */
-  var goldBarVideoLoaded = false;
-  function openBarFrame(){
-    barFrame.classList.add('open');
-    if (!goldBarVideoLoaded){
-      goldBarVideoLoaded = true;
-      goldBarVideo.src = 'https://raw.githubusercontent.com/ALZUMAN/alzuman-assets/main/scene1-ivory.mp4';
-      goldBarVideo.play().catch(function(){ /* autoplay may be deferred until user interaction on some browsers */ });
-    }
+  /* ============ rotateY: scroll progress + pointer/touch ============ */
+  var scrollAngle = 0;
+  var pointerAngle = 0;
+
+  function applyBarRotation(){
+    var angle = clamp(scrollAngle * 0.6 + pointerAngle * 0.4, -8, 8);
+    goldBar.style.transform = 'rotateY(' + angle.toFixed(2) + 'deg)';
   }
+
+  function onPointerMove(e){
+    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    if (typeof x !== 'number') return;
+    var ratio = (x / window.innerWidth) - 0.5; // -0.5 .. 0.5
+    pointerAngle = ratio * 16; // -8 .. 8
+    applyBarRotation();
+  }
+  window.addEventListener('mousemove', onPointerMove, {passive:true});
+  window.addEventListener('touchmove', onPointerMove, {passive:true});
 
   /* ============ 7) trust line: letter by letter ============ */
   var trustLine = document.getElementById('trustLine');
@@ -65,8 +78,13 @@
 
     // 2) open the bar window once we pass a fixed ratio of the hero height
     if (y > heroHeight * OPEN_RATIO){
-      openBarFrame();
+      barFrame.classList.add('open');
     }
+
+    // rotateY tied to scroll position within the bar scene
+    var within = clamp((y - barSceneTop + window.innerHeight * 0.5) / (barSceneHeight + window.innerHeight), 0, 1);
+    scrollAngle = Math.sin(within * Math.PI) * 8;
+    applyBarRotation();
 
     // 7) trust line lights up letter by letter with scroll progress
     var viewportH = window.innerHeight;

@@ -103,12 +103,25 @@ img{max-width:100%;display:block;}
   opacity:1;
   transform:scale(1);
 }
-.gold-bar-video{
+.gold-bar{
+  position:relative;
   width:100%;
   height:100%;
-  object-fit:cover;
   border-radius:4px;
-  background:linear-gradient(135deg,#F0D98C 0%,#B8913F 100%);
+  background:linear-gradient(135deg,#F0D98C 0%,#E7CA79 18%,#D8B159 38%,#B8913F 60%,#96712C 80%,#8B6914 100%);
+  box-shadow:inset 0 2px 4px rgba(255,255,255,.5), inset 0 -6px 14px rgba(0,0,0,.22);
+  transform-style:preserve-3d;
+  transition:transform .08s linear;
+  overflow:hidden;
+  will-change:transform;
+}
+.gold-bar .shine{
+  position:absolute;
+  top:-60%;left:-60%;
+  width:35%;height:220%;
+  background:linear-gradient(75deg,transparent 0%,rgba(255,255,255,.65) 50%,transparent 100%);
+  transform:rotate(18deg);
+  animation:shineMove 4s ease-in-out infinite;
 }
 @keyframes shineMove{
   0%{left:-60%;}
