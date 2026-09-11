@@ -96,24 +96,29 @@
   menuCloseBtn.addEventListener('click', closeMenu);
   mobileMenu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeMenu); });
 
+  /* ============ video autoplay (native timing — never seeked by scroll) ============ */
+  var videoA = document.getElementById('videoA');
+  var videoB = document.getElementById('videoB');
+  var videoC = document.getElementById('videoC');
+  [videoA, videoB, videoC].forEach(function(v){ v.play().catch(function(){}); });
+
   /* ============ reduced motion: static fallback ============ */
   if (reduceMotion || !window.gsap || !window.ScrollTrigger){
-    siteHeader.classList.add('solid');
-    document.getElementById('brandCue').style.display = 'none';
-    var layerA = document.getElementById('videoA');
-    var goldLayerAEl = document.getElementById('goldLayerA');
-    goldLayerAEl.style.opacity = 1;
-    goldLayerAEl.style.clipPath = 'inset(0 0 0 0)';
+    siteHeader.style.background = 'rgba(247,243,236,.86)';
+    siteHeader.style.backdropFilter = 'blur(10px)';
+    document.getElementById('headerWordmark').style.opacity = 1;
+    document.getElementById('headerWordmark').style.transform = 'translateY(0)';
+    document.getElementById('goldFrame').style.opacity = 1;
+    document.getElementById('goldLayerA').style.opacity = 1;
     document.getElementById('goldLayerB').style.opacity = 0;
-    layerA.play().catch(function(){});
     ['arrivalPhrase','megaNumber','megaCaption','valuePrice'].forEach(function(id){
       document.getElementById(id).style.opacity = 1;
     });
-    document.querySelectorAll('.aw i').forEach(function(i){ i.style.transform = 'translateY(0)'; });
+    document.querySelectorAll('.aw i, .mask-line i').forEach(function(i){ i.style.transform = 'translateY(0)'; });
     document.querySelectorAll('.mn-d').forEach(function(d){ d.style.transform = 'translateY(0)'; });
-    document.querySelectorAll('.brand-fall-wordmark .bl').forEach(function(l){
-      l.style.transform = 'translateY(0)'; l.style.opacity = 1; l.style.filter = 'blur(0)';
-    });
+    document.getElementById('brandLogo').style.opacity = 1;
+    document.getElementById('brandLogo').style.transform = 'scale(1)';
+    document.getElementById('transformFrame').style.opacity = 0;
     document.getElementById('transformBar').style.opacity = 1;
     document.getElementById('transformCaption').style.opacity = 1;
     document.querySelectorAll('[data-rate]').forEach(function(r){ r.style.opacity = 1; r.style.transform = 'none'; });
@@ -122,28 +127,12 @@
 
   gsap.registerPlugin(ScrollTrigger);
 
-  /* ============ video priming (mobile Safari currentTime reliability) ============ */
-  var videoA = document.getElementById('videoA');
-  var videoB = document.getElementById('videoB');
-  var videoC = document.getElementById('videoC');
-  function primeVideo(v){
-    v.play().then(function(){ v.pause(); }).catch(function(){});
-  }
-  [videoA, videoB, videoC].forEach(primeVideo);
-
-  var DUR_A = 10.04, DUR_B = 10.04, DUR_C = 10.04;
-  var EDGE_A = 4.2;   // scene1-ivory edge-on pose
-  var EDGE_B = 3.3;   // scene3-gold matching edge-on pose
-
-  function setTime(v, t){
-    if (Math.abs(v.currentTime - t) > 0.01){
-      try { v.currentTime = t; } catch(e){}
-    }
-  }
-
   var brandMark = document.getElementById('brandMark');
-  var brandCue = document.getElementById('brandCue');
-  var fallLetters = document.querySelectorAll('#brandFallWordmark .bl');
+  var scrollInvite = document.getElementById('scrollInvite');
+  var scrollPeek = document.getElementById('scrollPeek');
+  var brandLogo = document.getElementById('brandLogo');
+  var headerWordmark = document.getElementById('headerWordmark');
+  var goldFrame = document.getElementById('goldFrame');
   var goldLayerA = document.getElementById('goldLayerA');
   var goldLayerB = document.getElementById('goldLayerB');
   var transitionFlash = document.getElementById('transitionFlash');
@@ -154,10 +143,41 @@
   var valuePrice = document.getElementById('valuePrice');
   var actProgressDot = document.getElementById('actProgressDot');
 
-  function clipReveal(t){
-    var e = gsap.parseEase('power2.out')(clamp(t,0,1));
-    return 'inset(0 ' + (100 - e * 100) + '% 0 0)';
+  function ease(name, t){ return gsap.parseEase(name)(clamp(t,0,1)); }
+
+  // generic continuous keyframe interpolator: points = [[progress, value], ...],
+  // eased between each pair so nothing ever snaps and reverse-scroll is exact.
+  function kf(p, points){
+    for (var i = 0; i < points.length - 1; i++){
+      var a = points[i], b = points[i + 1];
+      if (p <= b[0] || i === points.length - 2){
+        var t = clamp((p - a[0]) / (b[0] - a[0] || 1), 0, 1);
+        return a[1] + (b[1] - a[1]) * ease('power2.inOut', t);
+      }
+    }
+    return points[points.length - 1][1];
   }
+
+  // scene boundaries (fractions of pin-stage progress, matching the 0-60% overall storyline)
+  var BRAND_END = 0.20;
+  var ARRIVAL_END = 0.467;
+  var MAT_A_END = 0.60;
+  var CROSS_END = 0.62;
+  var MACRO_START = 0.66;
+  var MACRO_PEAK = 0.70;
+  var MACRO_END = 0.735;
+  var MAT_END = 0.75;
+  var VALUE_END = 1.0;
+
+  // the bullion frame's width in vw, and its horizontal drift, as one continuous
+  // curve across the whole act — clamped well inside the 30-48vw brief limit,
+  // with exactly one deliberate macro moment that immediately restores scale after.
+  var GOLD_WIDTH_KF = [
+    [0, 0], [BRAND_END, 0], [BRAND_END + 0.05, 9], [ARRIVAL_END, 34],
+    [MAT_A_END, 36], [CROSS_END, 36], [MACRO_START, 38],
+    [MACRO_PEAK, 54], [MACRO_END, 40], [MAT_END, 40], [VALUE_END, 33]
+  ];
+  var GOLD_X_KF = [[0, 0], [MAT_END, 0], [VALUE_END, -15]];
 
   /* ============ ACT I master scrub: Brand -> Arrival -> Material -> Value ============ */
   ScrollTrigger.create({
@@ -169,90 +189,77 @@
     onUpdate: function(self){ renderAct(self.progress); }
   });
 
+  // BRAND FORMATION: plays once automatically on load — the first screen must
+  // already read as ALZUMAN before the visitor does anything, not after they scroll.
+  // Uses the supplied logo exactly as designed (its own typography, not a substitute font).
+  gsap.set(brandLogo, {opacity:0, scale:0.9, transformOrigin:'50% 50%'});
+  gsap.to(brandLogo, {opacity:1, scale:1, duration:0.95, ease:'power3.out', delay:0.1});
+
   function renderAct(p){
-    // scene boundaries (fractions of pin-stage progress, matching the 0-60% overall storyline)
-    var BRAND_END = 0.20;
-    var ARRIVAL_END = 0.467;
-    var MAT_A_END = 0.60;
-    var CROSS_END = 0.62;
-    var MAT_END = 0.75;
-    var VALUE_END = 1.0;
+    // scroll cues fade once the visitor actually starts scrolling
+    var cueOpacity = 1 - mapRange(p, 0.035, 0.09);
+    scrollInvite.style.opacity = cueOpacity;
+    scrollPeek.style.opacity = cueOpacity;
 
-    // BRAND: emblem settles, ALZUMAN letters fall into place one by one, cue fades
-    var brandCueOpacity = 1 - mapRange(p, 0.06, 0.10);
-    brandCue.style.opacity = brandCueOpacity;
-
-    fallLetters.forEach(function(letter, i){
-      var lt = mapRange(p, 0.02 + i * 0.014, 0.09 + i * 0.014);
-      var eased = gsap.parseEase('power4.out')(lt);
-      letter.style.transform = 'translateY(' + (-0.9 + eased * 0.9) + 'em)';
-      letter.style.opacity = eased;
-      letter.style.filter = 'blur(' + (6 * (1 - eased)) + 'px)';
-    });
-
-    // ARRIVAL: whole brand mark migrates toward header, header goes solid,
-    // gold layer A enters through a growing crop (discover, not reveal-all), phrase rises
+    // ARRIVAL: whole brand mark migrates toward header (continuous scale + position,
+    // never an abrupt swap), header solidifies smoothly, phrase rises
     var arriveT = mapRange(p, BRAND_END, ARRIVAL_END);
-    var arriveEase = gsap.parseEase('power3.inOut')(arriveT);
-    var markScale = 1 - arriveEase * 0.7;
+    var arriveEase = ease('power3.inOut', arriveT);
+    var markScale = 1 - arriveEase * 0.72;
     var markY = arriveEase * -38;
     brandMark.style.transform = 'translateY(' + markY + 'vh) scale(' + markScale + ')';
-    brandMark.style.opacity = 1 - mapRange(p, ARRIVAL_END - 0.03, ARRIVAL_END);
+    brandMark.style.opacity = 1 - mapRange(p, ARRIVAL_END - 0.04, ARRIVAL_END);
 
-    if (arriveEase > 0.92) siteHeader.classList.add('solid');
-    else siteHeader.classList.remove('solid');
-
-    var goldAIn = mapRange(p, BRAND_END + 0.02, BRAND_END + 0.10);
-    var goldACrop = mapRange(p, BRAND_END + 0.02, MAT_A_END - 0.02);
-    goldLayerA.style.opacity = goldAIn;
-    goldLayerA.style.clipPath = clipReveal(goldACrop);
+    var headerT = mapRange(p, ARRIVAL_END - 0.14, ARRIVAL_END + 0.01);
+    var headerEase = ease('power2.inOut', headerT);
+    siteHeader.style.background = 'rgba(247,243,236,' + (headerEase * 0.86) + ')';
+    siteHeader.style.backdropFilter = 'blur(' + (headerEase * 10) + 'px)';
+    siteHeader.style.boxShadow = '0 1px 0 rgba(27,42,65,' + (headerEase * 0.06) + ')';
+    headerWordmark.style.opacity = headerEase;
+    headerWordmark.style.transform = 'translateY(' + (6 - headerEase * 6) + 'px)';
 
     arrivalWords.forEach(function(word, i){
       var wt = mapRange(p, BRAND_END + 0.06 + i * 0.03, BRAND_END + 0.20 + i * 0.03);
-      var eased = gsap.parseEase('power4.out')(wt);
+      var eased = ease('power4.out', wt);
       word.style.transform = 'translateY(' + (105 - eased * 105) + '%)';
     });
 
-    // MATERIAL: scrub video A toward its edge pose, crossfade (masked wipe, not a flat
-    // dissolve) into video B at the matching pose, mega-number appears with per-digit fall
-    var matAT = mapRange(p, ARRIVAL_END, MAT_A_END);
-    if (matAT > 0) setTime(videoA, matAT * EDGE_A);
+    // GOLD FRAME: one continuous width/position curve — small window, soft-masked
+    // edges, one deliberate macro close-up that immediately restores comfortable scale
+    var frameW = kf(p, GOLD_WIDTH_KF);
+    var frameX = kf(p, GOLD_X_KF);
+    goldFrame.style.width = frameW + 'vw';
+    goldFrame.style.transform = 'translate(calc(-50% + ' + frameX + 'vw), -50%)';
+    goldFrame.style.opacity = mapRange(p, BRAND_END + 0.02, BRAND_END + 0.12);
 
+    // crossfade between the two clips behind a brief gold-reflection flash
     var crossT = mapRange(p, MAT_A_END, CROSS_END);
-    goldLayerA.style.opacity = Math.max(0, goldAIn - crossT);
+    goldLayerA.style.opacity = 1 - crossT;
     goldLayerB.style.opacity = crossT;
-    goldLayerB.style.clipPath = clipReveal(mapRange(p, MAT_A_END, MAT_A_END + 0.05));
-    if (crossT > 0 && crossT < 1) setTime(videoB, EDGE_B);
-    // a brief gold-reflection flash disguises the cut between the two clips
     transitionFlash.style.opacity = (1 - Math.abs(crossT * 2 - 1)) * (crossT > 0 && crossT < 1 ? 0.9 : 0);
 
-    var matBT = mapRange(p, CROSS_END, MAT_END);
-    if (matBT > 0) setTime(videoB, EDGE_B + matBT * (DUR_B * 0.9 - EDGE_B));
-    if (p >= CROSS_END) goldLayerB.style.opacity = 1;
-
-    // gold is allowed to pass in front of the number for the heart of this scene,
-    // then recedes behind it again before the number hands off to the value price
-    goldLayerB.style.zIndex = (p > MAT_A_END + 0.06 && p < MAT_END - 0.05) ? 4 : '';
+    // gold is allowed in front of the number for the heart of this scene, then recedes
+    goldFrame.style.zIndex = (p > MAT_A_END + 0.06 && p < MAT_END - 0.05) ? 4 : 2;
 
     var megaIn = mapRange(p, MAT_A_END, MAT_A_END + 0.06);
-    var megaOut = mapRange(p, MAT_END - 0.05, MAT_END);
-    var megaOpacity = megaIn * (1 - megaOut);
-    megaNumber.style.opacity = megaOpacity;
-    megaNumber.style.transform = 'translate(-50%,-50%) scale(' + (0.7 + megaIn * 0.3 + megaOut * 0.15) + ')';
     megaDigits.forEach(function(d, i){
       var dt = mapRange(p, MAT_A_END + i * 0.012, MAT_A_END + 0.05 + i * 0.012);
-      var eased = gsap.parseEase('power4.out')(dt);
+      var eased = ease('power4.out', dt);
       d.style.transform = 'translateY(' + (-0.5 + eased * 0.5) + 'em)';
     });
-    megaCaption.style.opacity = mapRange(p, MAT_A_END + 0.05, MAT_A_END + 0.11) * (1 - megaOut);
 
-    // VALUE: composition shifts, gold moves aside, integrated price appears
-    var valueT = mapRange(p, MAT_END, VALUE_END);
-    var valueEase = gsap.parseEase('power2.out')(valueT);
-    goldLayerB.style.transform = 'translateX(' + (-valueEase * 14) + 'vw) scale(' + (1 + valueEase * 0.06) + ')';
-    if (valueT > 0) setTime(videoB, EDGE_B + (DUR_B * 0.9 - EDGE_B) + valueEase * (DUR_B - (EDGE_B + (DUR_B * 0.9 - EDGE_B))));
+    // the number is a graphic object first, then shrinks into a small persistent
+    // annotation once the value scene takes over — it never simply vanishes
+    var megaScale = kf(p, [[MAT_A_END, 0.7], [MAT_A_END + 0.06, 1.0], [MAT_END - 0.05, 1.05], [MAT_END, 0.24], [VALUE_END, 0.24]]);
+    var megaY = kf(p, [[MAT_END - 0.05, 0], [MAT_END, -30], [VALUE_END, -30]]);
+    var megaOpacity = kf(p, [[MAT_A_END, 0], [MAT_A_END + 0.06, 1], [MAT_END - 0.05, 1], [MAT_END, 0.85], [VALUE_END, 0.85]]);
+    megaNumber.style.opacity = megaOpacity;
+    megaNumber.style.transform = 'translate(-50%,calc(-50% + ' + megaY + 'vh)) scale(' + megaScale + ')';
+    megaCaption.style.opacity = mapRange(p, MAT_A_END + 0.05, MAT_A_END + 0.11) * (1 - mapRange(p, MAT_END - 0.05, MAT_END));
+
+    // VALUE: price becomes typography, not a card — gold stays nearby, smaller
     valuePrice.style.opacity = mapRange(p, MAT_END + 0.05, VALUE_END - 0.05);
-    valuePrice.style.transform = 'translateY(-50%) translateX(' + (24 - valueEase * 24) + 'px)';
+    valuePrice.style.transform = 'translateY(-50%) translateX(' + (24 - ease('power2.out', mapRange(p, MAT_END, VALUE_END)) * 24) + 'px)';
 
     actProgressDot.style.transform = 'translateY(' + (p * 18) + 'vh)';
   }
@@ -266,7 +273,8 @@
     }
   });
 
-  /* ============ PRODUCT TRANSFORMATION: pinned video scrub + handoff ============ */
+  /* ============ PRODUCT TRANSFORMATION: the cinematic bar shrinks into the first product ============ */
+  var transformFrame = document.getElementById('transformFrame');
   var transformBar = document.getElementById('transformBar');
   var transformCaption = document.getElementById('transformCaption');
 
@@ -278,13 +286,17 @@
     scrub: 0.4,
     onUpdate: function(self){
       var p = self.progress;
-      // scrub videoC in reverse: bar recedes/transforms rather than simply looping
-      setTime(videoC, DUR_C - p * DUR_C * 0.95);
-      var barIn = mapRange(p, 0.55, 0.85);
-      transformBar.style.opacity = barIn;
-      transformCaption.style.opacity = mapRange(p, 0.35, 0.6) * (1 - mapRange(p, 0.9, 1));
-      videoC.parentElement.style.opacity = 1 - mapRange(p, 0.7, 1);
+      var frameW = kf(p, [[0, 34], [0.55, 34], [0.85, 15]]);
+      transformFrame.style.width = frameW + 'vw';
+      transformFrame.style.opacity = 1 - mapRange(p, 0.75, 0.94);
+      transformBar.style.opacity = mapRange(p, 0.58, 0.82);
+      transformCaption.style.opacity = mapRange(p, 0.32, 0.55) * (1 - mapRange(p, 0.86, 1));
     }
+  });
+
+  gsap.fromTo('#shopTitleWord', {yPercent:105}, {
+    yPercent:0, duration:0.9, ease:'power4.out',
+    scrollTrigger:{trigger:'#shop', start:'top 82%'}
   });
 
   /* ============ product rows: light entrance on scroll ============ */
