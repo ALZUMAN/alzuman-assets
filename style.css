@@ -180,51 +180,15 @@ button{font-family:inherit;}
   100%{transform:translateY(0); opacity:1;}
 }
 
-/* a thin gold-tinted glow at the very bottom edge, hinting at content below the fold */
-.scroll-peek{
+/* hero video: full-bleed cinematic background — purpose-composed footage with
+   its own headroom for typography, so it plays behind everything, edge to edge */
+.hero-video-bg{
   position:absolute;
   z-index:1;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
-  width:46vw;
-  max-width:220px;
-  height:14px;
-  border-radius:3px 3px 0 0;
-  background:linear-gradient(180deg, transparent, rgba(216,177,89,.5));
-}
-
-/* gold frame: a small, masked, contained window — never fullscreen, never a visible rectangle */
-.gold-frame{
-  position:absolute;
-  z-index:2;
-  left:50%;
-  top:58%;
-  width:0;
-  aspect-ratio:1.7/1;
-  transform:translate(-50%,-50%);
+  inset:0;
   overflow:hidden;
-  border-radius:3px;
-  mask-image:radial-gradient(ellipse 60% 58% at 50% 50%, black 55%, transparent 100%);
-  -webkit-mask-image:radial-gradient(ellipse 60% 58% at 50% 50%, black 55%, transparent 100%);
-  filter:drop-shadow(0 16px 34px rgba(27,42,65,.16));
-  will-change:width, transform, opacity;
 }
-.gold-video-layer{
-  position:absolute;
-  inset:0;
-  opacity:0;
-  will-change:opacity;
-}
-.transition-flash{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(115deg, transparent 30%, rgba(255,247,225,.85) 50%, transparent 70%);
-  opacity:0;
-  pointer-events:none;
-  mix-blend-mode:screen;
-}
-.gold-video-layer video{
+.hero-video-bg video{
   position:absolute;
   inset:0;
   width:100%;
@@ -613,9 +577,7 @@ button{font-family:inherit;}
   .pin-stage{height:auto;}
   .pin-inner{position:relative; height:auto; min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10vh 6vw;}
   .brand-mark{position:relative; inset:auto; margin-bottom:4vh;}
-  .gold-frame{position:relative; inset:auto; left:auto; top:auto; transform:none !important; width:60vw !important; margin:4vh auto; mask-image:none; -webkit-mask-image:none;}
-  .gold-video-layer{opacity:1 !important;}
-  .scroll-invite, .scroll-peek{display:none;}
+  .scroll-invite{display:none;}
   .arrival-phrase, .mega-number, .mega-caption, .value-price{position:relative; inset:auto; transform:none !important; opacity:1 !important; margin:2rem auto;}
   .transform-stage{height:auto;}
   .transform-inner{position:relative; height:auto; padding:8vh 0;}
