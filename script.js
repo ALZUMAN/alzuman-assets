@@ -1,231 +1,252 @@
 (function(){
   'use strict';
 
-  /* ============ helpers ============ */
   var clamp = function(v,min,max){ return Math.max(min,Math.min(max,v)); };
+  var mapRange = function(p,a,b){ return clamp((p-a)/(b-a),0,1); };
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ============ 2) BAR WINDOWS: fixed-pixel scroll trigger (one per clip) ============ */
-  var hero = document.getElementById('hero');
-  var heroHeight = hero.offsetHeight;
-
-  var barScenes = Array.prototype.map.call(document.querySelectorAll('[data-bar-scene]'), function(scene){
-    return {
-      scene: scene,
-      video: scene.querySelector('[data-bar-video]'),
-      src: scene.getAttribute('data-src'),
-      loaded: false,
-      top: scene.offsetTop,
-      height: scene.offsetHeight
-    };
-  });
-
-  window.addEventListener('resize', function(){
-    heroHeight = hero.offsetHeight;
-    barScenes.forEach(function(b){
-      b.top = b.scene.offsetTop;
-      b.height = b.scene.offsetHeight;
-    });
-  });
-
-  var OPEN_RATIO = 0.6; // open once we've scrolled 60% of the hero's height
-
-  function openBarScene(b){
-    b.scene.classList.add('open');
-    if (!b.loaded){
-      b.loaded = true;
-      b.video.src = b.src;
-      b.video.play().catch(function(){ /* autoplay may be deferred until user interaction on some browsers */ });
-    }
-  }
-
-  /* ============ 7) trust line: letter by letter ============ */
-  var trustLine = document.getElementById('trustLine');
-  var trustText = trustLine.getAttribute('aria-label') || trustLine.textContent;
-  (function buildTrustLetters(){
-    var frag = document.createDocumentFragment();
-    for (var i = 0; i < trustText.length; i++){
-      var span = document.createElement('span');
-      span.className = 'ch';
-      span.textContent = trustText[i];
-      frag.appendChild(span);
-    }
-    trustLine.textContent = '';
-    trustLine.appendChild(frag);
-  })();
-  var trustChars = trustLine.querySelectorAll('.ch');
-  var trustScene = document.getElementById('trust-scene');
-  var trustSceneTop = trustScene.offsetTop;
-  var trustSceneHeight = trustScene.offsetHeight;
-  window.addEventListener('resize', function(){
-    trustSceneTop = trustScene.offsetTop;
-    trustSceneHeight = trustScene.offsetHeight;
-  });
-
-  /* ============ scroll handler (rAF throttled, fixed-pixel math) ============ */
-  var ticking = false;
-  function onScroll(){
-    if (!ticking){
-      window.requestAnimationFrame(handleScroll);
-      ticking = true;
-    }
-  }
-  function handleScroll(){
-    ticking = false;
-    var y = window.scrollY || window.pageYOffset;
-
-    // 2) open each bar window once we pass a fixed ratio of the hero height
-    // (first window uses the hero as its trigger reference; each subsequent
-    // window uses its own offsetTop, so opening stays tied to fixed pixel
-    // positions rather than fragile viewport-relative rects)
-    barScenes.forEach(function(b, i){
-      var threshold = i === 0 ? heroHeight * OPEN_RATIO : b.top - window.innerHeight * (1 - OPEN_RATIO);
-      if (y > threshold){
-        openBarScene(b);
-      }
-    });
-
-    // 7) trust line lights up letter by letter with scroll progress
-    var viewportH = window.innerHeight;
-    var progress = (y + viewportH - trustSceneTop) / (trustSceneHeight * 0.9);
-    progress = clamp(progress, 0, 1);
-    var litCount = Math.floor(progress * trustChars.length);
-    for (var i = 0; i < trustChars.length; i++){
-      if (i < litCount) trustChars[i].classList.add('lit');
-      else trustChars[i].classList.remove('lit');
-    }
-  }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  handleScroll();
-
-  /* ============ 3-5) phrase reveal + underline draw ============ */
-  var phraseScenes = document.querySelectorAll('[data-phrase]');
-  var phraseObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if (entry.isIntersecting){
-        entry.target.classList.add('in-view');
-      }
-    });
-  }, {threshold:0.4});
-  phraseScenes.forEach(function(scene){ phraseObserver.observe(scene); });
-
-  /* ============ 5) purity counter 0 -> 999.9 ============ */
-  var counterScene = document.getElementById('counterScene');
-  var purityCounter = document.getElementById('purityCounter');
-  var counterDone = false;
-  var counterObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if (entry.isIntersecting && !counterDone){
-        counterDone = true;
-        runCounter();
-      }
-    });
-  }, {threshold:0.5});
-  counterObserver.observe(counterScene);
-
-  function runCounter(){
-    var duration = 1800;
-    var start = null;
-    var target = 999.9;
-    function easeOutQuint(t){ return 1 - Math.pow(1 - t, 5); }
-    function step(ts){
-      if (start === null) start = ts;
-      var elapsed = ts - start;
-      var t = clamp(elapsed / duration, 0, 1);
-      var val = target * easeOutQuint(t);
-      purityCounter.textContent = val.toFixed(1);
-      if (t < 1) window.requestAnimationFrame(step);
-      else purityCounter.textContent = target.toFixed(1);
-    }
-    window.requestAnimationFrame(step);
-  }
-
-  /* ============ 6) weight selector + live price ============ */
-  var WEIGHTS = [
-    {label:'١ غ',  grams:1,        dims:'8 × 15 × 0.4',  visualW:34,  visualH:52},
-    {label:'٢ غ',  grams:2,        dims:'11 × 19 × 0.5', visualW:44,  visualH:66},
-    {label:'٥ غ',  grams:5,        dims:'14 × 23 × 0.7', visualW:56,  visualH:82},
-    {label:'١٠ غ', grams:10,       dims:'17 × 28 × 0.9', visualW:68,  visualH:98},
-    {label:'أونصة', grams:31.1035, dims:'24 × 41 × 1.9', visualW:96,  visualH:140}
-  ];
+  /* ============ pricing engine (reused) ============ */
   var OUNCE_GRAMS = 31.1035;
   var SAR_PER_USD = 3.75;
-
-  var weightTabsEl = document.getElementById('weightTabs');
-  var weightBarVisual = document.getElementById('weightBarVisual');
-  var detailWeight = document.getElementById('detailWeight');
-  var detailDims = document.getElementById('detailDims');
-  var detailPrice = document.getElementById('detailPrice');
-
-  var activeIndex = 0;
-
-  WEIGHTS.forEach(function(w, i){
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'weight-tab' + (i === 0 ? ' active' : '');
-    btn.textContent = w.label;
-    btn.setAttribute('role','tab');
-    btn.addEventListener('click', function(){
-      activeIndex = i;
-      Array.prototype.forEach.call(weightTabsEl.children, function(c){ c.classList.remove('active'); });
-      btn.classList.add('active');
-      renderWeight();
-    });
-    weightTabsEl.appendChild(btn);
-  });
+  var WEIGHTS = [
+    {label:'١ غرام',  grams:1,        dims:'8 × 15 × 0.4',  visualW:34,  visualH:52},
+    {label:'٢ غرام',  grams:2,        dims:'11 × 19 × 0.5', visualW:44,  visualH:66},
+    {label:'٥ غرامات', grams:5,        dims:'14 × 23 × 0.7', visualW:56,  visualH:82},
+    {label:'١٠ غرامات', grams:10,       dims:'17 × 28 × 0.9', visualW:68,  visualH:98},
+    {label:'أونصة (٣١.١٠٣٥غ)', grams:OUNCE_GRAMS, dims:'24 × 41 × 1.9', visualW:96,  visualH:140}
+  ];
+  var ouncePrice = 4183.40;
 
   function formatSAR(v){
     return v.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ر.س';
   }
-
+  function formatUSD(v){
+    return '$' + v.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
   function priceForGrams(grams){
     return ((ouncePrice + 50) / OUNCE_GRAMS) * SAR_PER_USD * grams;
   }
 
-  function renderWeight(){
-    var w = WEIGHTS[activeIndex];
-    weightBarVisual.style.width = w.visualW + 'px';
-    weightBarVisual.style.height = w.visualH + 'px';
-    detailWeight.textContent = w.grams === OUNCE_GRAMS ? '31.1035 غ (أونصة)' : w.grams + ' غ';
-    detailDims.textContent = w.dims + ' مم';
-    detailPrice.textContent = formatSAR(priceForGrams(w.grams));
-  }
+  /* ============ product list (shop) ============ */
+  var productListEl = document.getElementById('productList');
+  var priceEls = [];
+  WEIGHTS.forEach(function(w){
+    var row = document.createElement('div');
+    row.className = 'product-row';
+    row.innerHTML =
+      '<div class="product-visual" style="width:'+w.visualW+'px;height:'+w.visualH+'px;"><div class="shine"></div></div>' +
+      '<div class="product-info">' +
+        '<div class="product-weight">'+w.label+'</div>' +
+        '<span class="product-dims" dir="ltr">'+w.dims+' مم</span>' +
+        '<span class="product-price num" dir="ltr"></span>' +
+        '<a href="tel:0562658444" class="product-cta">اطلب الآن ←</a>' +
+      '</div>';
+    productListEl.appendChild(row);
+    priceEls.push({el:row.querySelector('.product-price'), grams:w.grams});
+  });
 
-  /* ============ live ticker ============ */
-  var ouncePrice = 4183.40;
-  var tickerValueEl = document.getElementById('tickerValue');
-  var tickerArrowEl = document.getElementById('tickerArrow');
-  var tickerEl = document.getElementById('priceTicker');
+  /* ============ market + value DOM refs ============ */
+  var rateGramEl = document.getElementById('rateGram');
+  var rate5gEl = document.getElementById('rate5g');
+  var rate10gEl = document.getElementById('rate10g');
+  var rateOunceSarEl = document.getElementById('rateOunceSar');
+  var rateOunceUsdEl = document.getElementById('rateOunceUsd');
+  var ounceArrowEl = document.getElementById('ounceArrow');
+  var valueAmountEl = document.getElementById('valueAmount');
 
-  function renderTicker(direction){
-    tickerValueEl.textContent = '$' + ouncePrice.toFixed(2);
-    tickerValueEl.classList.remove('up','down');
-    tickerArrowEl.classList.remove('up','down');
-    if (direction === 'up'){
-      tickerValueEl.classList.add('up');
-      tickerArrowEl.classList.add('up');
-      tickerArrowEl.textContent = '▲';
-    } else if (direction === 'down'){
-      tickerValueEl.classList.add('down');
-      tickerArrowEl.classList.add('down');
-      tickerArrowEl.textContent = '▼';
-    } else {
-      tickerArrowEl.textContent = '—';
-    }
-    tickerEl.classList.add('pulse');
-    window.setTimeout(function(){ tickerEl.classList.remove('pulse'); }, 220);
+  function renderPrices(direction){
+    rateGramEl.textContent = formatSAR(priceForGrams(1));
+    rate5gEl.textContent = formatSAR(priceForGrams(5));
+    rate10gEl.textContent = formatSAR(priceForGrams(10));
+    rateOunceSarEl.textContent = formatSAR(priceForGrams(OUNCE_GRAMS));
+    rateOunceUsdEl.textContent = formatUSD(ouncePrice);
+    valueAmountEl.textContent = formatSAR(priceForGrams(1));
+    priceEls.forEach(function(p){ p.el.textContent = formatSAR(priceForGrams(p.grams)); });
+
+    ounceArrowEl.classList.remove('up','down');
+    if (direction === 'up'){ ounceArrowEl.classList.add('up'); ounceArrowEl.textContent = '▲'; }
+    else if (direction === 'down'){ ounceArrowEl.classList.add('down'); ounceArrowEl.textContent = '▼'; }
+    else { ounceArrowEl.textContent = '—'; }
   }
 
   function updatePrice(){
     var prev = ouncePrice;
-    var delta = (Math.random() * 2 - 1) * 2.4; // +/- 2.4
+    var delta = (Math.random() * 2 - 1) * 2.4;
     ouncePrice = Math.round((ouncePrice + delta) * 100) / 100;
-    var direction = ouncePrice > prev ? 'up' : (ouncePrice < prev ? 'down' : null);
-    renderTicker(direction);
-    renderWeight();
+    renderPrices(ouncePrice > prev ? 'up' : (ouncePrice < prev ? 'down' : null));
+  }
+  renderPrices(null);
+  window.setInterval(updatePrice, 5000);
+
+  /* ============ header + mobile menu ============ */
+  var siteHeader = document.getElementById('siteHeader');
+  var menuBtn = document.getElementById('menuBtn');
+  var menuCloseBtn = document.getElementById('menuCloseBtn');
+  var mobileMenu = document.getElementById('mobileMenu');
+
+  function openMenu(){ mobileMenu.classList.add('open'); menuBtn.setAttribute('aria-expanded','true'); }
+  function closeMenu(){ mobileMenu.classList.remove('open'); menuBtn.setAttribute('aria-expanded','false'); }
+  menuBtn.addEventListener('click', openMenu);
+  menuCloseBtn.addEventListener('click', closeMenu);
+  mobileMenu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeMenu); });
+
+  /* ============ reduced motion: static fallback ============ */
+  if (reduceMotion || !window.gsap || !window.ScrollTrigger){
+    siteHeader.classList.add('solid');
+    document.getElementById('brandCue').style.display = 'none';
+    var layerA = document.getElementById('videoA');
+    document.getElementById('goldLayerA').style.opacity = 1;
+    document.getElementById('goldLayerB').style.opacity = 0;
+    layerA.play().catch(function(){});
+    ['arrivalPhrase','megaNumber','valuePrice'].forEach(function(id){
+      document.getElementById(id).style.opacity = 1;
+    });
+    document.querySelectorAll('.aw i').forEach(function(i){ i.style.transform = 'translateY(0)'; });
+    document.getElementById('transformBar').style.opacity = 1;
+    document.getElementById('transformCaption').style.opacity = 1;
+    document.querySelectorAll('[data-rate]').forEach(function(r){ r.style.opacity = 1; r.style.transform = 'none'; });
+    return;
   }
 
-  renderWeight();
-  renderTicker(null);
-  window.setInterval(updatePrice, 5000);
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ============ video priming (mobile Safari currentTime reliability) ============ */
+  var videoA = document.getElementById('videoA');
+  var videoB = document.getElementById('videoB');
+  var videoC = document.getElementById('videoC');
+  function primeVideo(v){
+    v.play().then(function(){ v.pause(); }).catch(function(){});
+  }
+  [videoA, videoB, videoC].forEach(primeVideo);
+
+  var DUR_B = 10.04, DUR_C = 10.04;
+  var EDGE_A = 4.2;   // scene1-ivory edge-on pose
+  var EDGE_B = 3.3;   // scene3-gold matching edge-on pose
+
+  function setTime(v, t){
+    if (Math.abs(v.currentTime - t) > 0.01){
+      try { v.currentTime = t; } catch(e){}
+    }
+  }
+
+  var brandLogo = document.getElementById('brandLogo');
+  var brandCue = document.getElementById('brandCue');
+  var goldLayerA = document.getElementById('goldLayerA');
+  var goldLayerB = document.getElementById('goldLayerB');
+  var arrivalWords = document.querySelectorAll('#arrivalPhrase .aw i');
+  var megaNumber = document.getElementById('megaNumber');
+  var valuePrice = document.getElementById('valuePrice');
+  var actProgressDot = document.getElementById('actProgressDot');
+
+  /* ============ ACT I master scrub: Brand -> Arrival -> Material -> Value ============ */
+  ScrollTrigger.create({
+    trigger: '#pinStage',
+    start: 'top top',
+    end: 'bottom bottom',
+    pin: '.pin-inner',
+    scrub: 0.4,
+    onUpdate: function(self){ renderAct(self.progress); }
+  });
+
+  function renderAct(p){
+    // scene boundaries (fractions of pin-stage progress, matching the 0-60% overall storyline)
+    var BRAND_END = 0.20;
+    var ARRIVAL_END = 0.467;
+    var MAT_A_END = 0.60;
+    var CROSS_END = 0.62;
+    var MAT_END = 0.75;
+    var VALUE_END = 1.0;
+
+    // BRAND: logo settles, cue fades
+    var brandCueOpacity = 1 - mapRange(p, 0.06, 0.10);
+    brandCue.style.opacity = brandCueOpacity;
+
+    // ARRIVAL: logo migrates toward header, header goes solid, gold layer A fades in, phrase rises
+    var arriveT = mapRange(p, BRAND_END, ARRIVAL_END);
+    var arriveEase = gsap.parseEase('power3.inOut')(arriveT);
+    var logoScale = 1 - arriveEase * 0.78;
+    var logoY = arriveEase * -38;
+    brandLogo.style.transform = 'translateY(' + logoY + 'vh) scale(' + logoScale + ')';
+    brandLogo.style.opacity = 1 - mapRange(p, ARRIVAL_END - 0.03, ARRIVAL_END);
+
+    if (arriveEase > 0.92) siteHeader.classList.add('solid');
+    else siteHeader.classList.remove('solid');
+
+    var goldAIn = mapRange(p, BRAND_END + 0.02, BRAND_END + 0.10);
+    goldLayerA.style.opacity = goldAIn;
+
+    arrivalWords.forEach(function(word, i){
+      var wt = mapRange(p, BRAND_END + 0.06 + i * 0.03, BRAND_END + 0.20 + i * 0.03);
+      var eased = gsap.parseEase('power4.out')(wt);
+      word.style.transform = 'translateY(' + (105 - eased * 105) + '%)';
+    });
+
+    // MATERIAL: scrub video A toward its edge pose, crossfade to video B at matching pose, mega-number appears
+    var matAT = mapRange(p, ARRIVAL_END, MAT_A_END);
+    if (matAT > 0) setTime(videoA, matAT * EDGE_A);
+
+    var crossT = mapRange(p, MAT_A_END, CROSS_END);
+    goldLayerA.style.opacity = Math.max(0, goldAIn - crossT);
+    goldLayerB.style.opacity = crossT;
+    if (crossT > 0 && crossT < 1) setTime(videoB, EDGE_B);
+
+    var matBT = mapRange(p, CROSS_END, MAT_END);
+    if (matBT > 0) setTime(videoB, EDGE_B + matBT * (DUR_B * 0.9 - EDGE_B));
+    if (p >= CROSS_END) goldLayerB.style.opacity = 1;
+
+    var megaIn = mapRange(p, MAT_A_END, MAT_A_END + 0.06);
+    var megaOut = mapRange(p, MAT_END - 0.05, MAT_END);
+    var megaOpacity = megaIn * (1 - megaOut);
+    megaNumber.style.opacity = megaOpacity;
+    megaNumber.style.transform = 'translate(-50%,-50%) scale(' + (0.7 + megaIn * 0.3 + megaOut * 0.15) + ')';
+
+    // VALUE: composition shifts, gold moves aside, integrated price appears
+    var valueT = mapRange(p, MAT_END, VALUE_END);
+    var valueEase = gsap.parseEase('power2.out')(valueT);
+    goldLayerB.style.transform = 'translateX(' + (-valueEase * 14) + 'vw) scale(' + (1 + valueEase * 0.06) + ')';
+    if (valueT > 0) setTime(videoB, EDGE_B + (DUR_B * 0.9 - EDGE_B) + valueEase * (DUR_B - (EDGE_B + (DUR_B * 0.9 - EDGE_B))));
+    valuePrice.style.opacity = mapRange(p, MAT_END + 0.05, VALUE_END - 0.05);
+    valuePrice.style.transform = 'translateY(-50%) translateX(' + (24 - valueEase * 24) + 'px)';
+
+    actProgressDot.style.transform = 'translateY(' + (p * 18) + 'vh)';
+  }
+  renderAct(0);
+
+  /* ============ MARKET: staggered reveal ============ */
+  ScrollTrigger.batch('[data-rate]', {
+    start: 'top 85%',
+    onEnter: function(batch){
+      gsap.to(batch, {opacity:1, y:0, duration:0.7, stagger:0.12, ease:'power3.out'});
+    }
+  });
+
+  /* ============ PRODUCT TRANSFORMATION: pinned video scrub + handoff ============ */
+  var transformBar = document.getElementById('transformBar');
+  var transformCaption = document.getElementById('transformCaption');
+
+  ScrollTrigger.create({
+    trigger: '#transformStage',
+    start: 'top top',
+    end: 'bottom bottom',
+    pin: '.transform-inner',
+    scrub: 0.4,
+    onUpdate: function(self){
+      var p = self.progress;
+      // scrub videoC in reverse: bar recedes/transforms rather than simply looping
+      setTime(videoC, DUR_C - p * DUR_C * 0.95);
+      var barIn = mapRange(p, 0.55, 0.85);
+      transformBar.style.opacity = barIn;
+      transformCaption.style.opacity = mapRange(p, 0.35, 0.6) * (1 - mapRange(p, 0.9, 1));
+      videoC.parentElement.style.opacity = 1 - mapRange(p, 0.7, 1);
+    }
+  });
+
+  /* ============ product rows: light entrance on scroll ============ */
+  gsap.utils.toArray('.product-row').forEach(function(row){
+    gsap.fromTo(row, {opacity:0, y:24}, {
+      opacity:1, y:0, duration:0.7, ease:'power3.out',
+      scrollTrigger:{trigger:row, start:'top 88%'}
+    });
+  });
 
 })();
