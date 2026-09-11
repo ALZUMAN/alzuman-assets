@@ -1,0 +1,11 @@
+# Reference-only / broken binaries — never shipped in the deployment.
+# See README.md for details on why each is excluded.
+alzuman-bar.glb
+alzuman-bar-999.glb
+scene1-ivory.mp4
+scene2-sand.mp4
+scene3-gold.mp4
+hf_20260910_192837_587d43b1-4849-4956-b377-257b300dcc32.mp4
+hf_20260910_195212_b70d0451-4cde-4002-a5b5-e6878b54bf3a.mp4
+hf_20260910_195213_eecd1e9e-2262-444d-b621-8078181625b3.mp4
+hf_20260910_195213_ef3d72ee-10a2-4db4-9474-db2764fba106.mp4
