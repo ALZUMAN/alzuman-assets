@@ -84,31 +84,29 @@ img{max-width:100%;display:block;}
   100%{transform:translateY(12px);opacity:0;}
 }
 
-/* ---------- 2. BAR WINDOW SCENE ---------- */
-.bar-scene{background:linear-gradient(180deg,var(--ivory),var(--ivory-deep));}
-.bar-frame{
-  width:min(560px,86vw);
-  aspect-ratio:1.6/1;
-  border-radius:4px;
-  background:var(--ivory);
-  box-shadow:0 30px 70px -20px rgba(27,42,65,.28);
-  transform:scale(.82);
-  opacity:0;
-  transition:transform .9s cubic-bezier(.19,1,.22,1), opacity .9s ease;
+/* ---------- 2. FULL-BLEED BAR VIDEO SCENES ---------- */
+.bar-scene{
+  position:relative;
+  width:100%;
+  min-height:100vh;
   overflow:hidden;
-  perspective:1200px;
-  padding:14px;
-}
-.bar-frame.open{
-  opacity:1;
-  transform:scale(1);
+  background:linear-gradient(135deg,#F0D98C 0%,#B8913F 100%);
 }
 .gold-bar-video{
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
-  border-radius:4px;
-  background:linear-gradient(135deg,#F0D98C 0%,#B8913F 100%);
+  opacity:0;
+  transition:opacity 1.1s ease;
+}
+.bar-scene.open .gold-bar-video{opacity:1;}
+.bar-scene-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(27,42,65,.15) 0%,rgba(27,42,65,0) 30%,rgba(27,42,65,0) 60%,rgba(27,42,65,.35) 100%);
+  pointer-events:none;
 }
 @keyframes shineMove{
   0%{left:-60%;}

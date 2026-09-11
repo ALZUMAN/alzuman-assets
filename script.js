@@ -11,7 +11,6 @@
   var barScenes = Array.prototype.map.call(document.querySelectorAll('[data-bar-scene]'), function(scene){
     return {
       scene: scene,
-      frame: scene.querySelector('[data-bar-frame]'),
       video: scene.querySelector('[data-bar-video]'),
       src: scene.getAttribute('data-src'),
       loaded: false,
@@ -31,7 +30,7 @@
   var OPEN_RATIO = 0.6; // open once we've scrolled 60% of the hero's height
 
   function openBarScene(b){
-    b.frame.classList.add('open');
+    b.scene.classList.add('open');
     if (!b.loaded){
       b.loaded = true;
       b.video.src = b.src;
