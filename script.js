@@ -4,42 +4,40 @@
   /* ============ helpers ============ */
   var clamp = function(v,min,max){ return Math.max(min,Math.min(max,v)); };
 
-  /* ============ 2) BAR WINDOW: fixed-pixel scroll trigger ============ */
+  /* ============ 2) BAR WINDOWS: fixed-pixel scroll trigger (one per clip) ============ */
   var hero = document.getElementById('hero');
-  var barScene = document.getElementById('bar-scene');
-  var barFrame = document.getElementById('barFrame');
-  var goldBar = document.getElementById('goldBar');
-
   var heroHeight = hero.offsetHeight;
-  var barSceneTop = barScene.offsetTop;
-  var barSceneHeight = barScene.offsetHeight;
+
+  var barScenes = Array.prototype.map.call(document.querySelectorAll('[data-bar-scene]'), function(scene){
+    return {
+      scene: scene,
+      frame: scene.querySelector('[data-bar-frame]'),
+      video: scene.querySelector('[data-bar-video]'),
+      src: scene.getAttribute('data-src'),
+      loaded: false,
+      top: scene.offsetTop,
+      height: scene.offsetHeight
+    };
+  });
 
   window.addEventListener('resize', function(){
     heroHeight = hero.offsetHeight;
-    barSceneTop = barScene.offsetTop;
-    barSceneHeight = barScene.offsetHeight;
+    barScenes.forEach(function(b){
+      b.top = b.scene.offsetTop;
+      b.height = b.scene.offsetHeight;
+    });
   });
 
   var OPEN_RATIO = 0.6; // open once we've scrolled 60% of the hero's height
 
-  /* ============ rotateY: scroll progress + pointer/touch ============ */
-  var scrollAngle = 0;
-  var pointerAngle = 0;
-
-  function applyBarRotation(){
-    var angle = clamp(scrollAngle * 0.6 + pointerAngle * 0.4, -8, 8);
-    goldBar.style.transform = 'rotateY(' + angle.toFixed(2) + 'deg)';
+  function openBarScene(b){
+    b.frame.classList.add('open');
+    if (!b.loaded){
+      b.loaded = true;
+      b.video.src = b.src;
+      b.video.play().catch(function(){ /* autoplay may be deferred until user interaction on some browsers */ });
+    }
   }
-
-  function onPointerMove(e){
-    var x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
-    if (typeof x !== 'number') return;
-    var ratio = (x / window.innerWidth) - 0.5; // -0.5 .. 0.5
-    pointerAngle = ratio * 16; // -8 .. 8
-    applyBarRotation();
-  }
-  window.addEventListener('mousemove', onPointerMove, {passive:true});
-  window.addEventListener('touchmove', onPointerMove, {passive:true});
 
   /* ============ 7) trust line: letter by letter ============ */
   var trustLine = document.getElementById('trustLine');
@@ -76,15 +74,16 @@
     ticking = false;
     var y = window.scrollY || window.pageYOffset;
 
-    // 2) open the bar window once we pass a fixed ratio of the hero height
-    if (y > heroHeight * OPEN_RATIO){
-      barFrame.classList.add('open');
-    }
-
-    // rotateY tied to scroll position within the bar scene
-    var within = clamp((y - barSceneTop + window.innerHeight * 0.5) / (barSceneHeight + window.innerHeight), 0, 1);
-    scrollAngle = Math.sin(within * Math.PI) * 8;
-    applyBarRotation();
+    // 2) open each bar window once we pass a fixed ratio of the hero height
+    // (first window uses the hero as its trigger reference; each subsequent
+    // window uses its own offsetTop, so opening stays tied to fixed pixel
+    // positions rather than fragile viewport-relative rects)
+    barScenes.forEach(function(b, i){
+      var threshold = i === 0 ? heroHeight * OPEN_RATIO : b.top - window.innerHeight * (1 - OPEN_RATIO);
+      if (y > threshold){
+        openBarScene(b);
+      }
+    });
 
     // 7) trust line lights up letter by letter with scroll progress
     var viewportH = window.innerHeight;
