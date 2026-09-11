@@ -133,15 +133,39 @@ button{font-family:inherit;}
 .brand-mark{
   position:absolute;
   inset:0;
+  z-index:3;
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
   will-change:transform, opacity;
 }
-.brand-logo{
-  width:min(220px,52vw);
-  clip-path:inset(0% 0% 0% 0%);
-  filter:blur(0px);
+.brand-emblem-crop{
+  width:min(150px,34vw);
+  height:calc(min(150px,34vw) * 0.49);
+  overflow:hidden;
+  margin:0 auto;
+}
+.brand-emblem{
+  width:100%;
+}
+.brand-fall-wordmark{
+  margin:1.1rem 0 0;
+  display:flex;
+  justify-content:center;
+  gap:.06em;
+  font-family:'Cormorant Garamond', serif;
+  font-weight:600;
+  font-size:clamp(1.6rem,7vw,2.4rem);
+  letter-spacing:.32em;
+  direction:ltr;
+  color:var(--navy);
+}
+.brand-fall-wordmark .bl{
+  display:inline-block;
+  transform:translateY(-.9em);
+  opacity:0;
+  filter:blur(6px);
 }
 .brand-cue{
   position:absolute;
@@ -173,12 +197,22 @@ button{font-family:inherit;}
   position:absolute;
   inset:0;
   overflow:hidden;
+  z-index:2;
 }
 .gold-video-layer{
   position:absolute;
   inset:0;
   opacity:0;
-  will-change:opacity;
+  will-change:opacity, clip-path;
+  clip-path:inset(0 100% 0 0);
+}
+.transition-flash{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(115deg, transparent 30%, rgba(255,247,225,.85) 50%, transparent 70%);
+  opacity:0;
+  pointer-events:none;
+  mix-blend-mode:screen;
 }
 .gold-video-layer video{
   position:absolute;
@@ -198,6 +232,7 @@ button{font-family:inherit;}
 /* editorial phrase layer (arrival) */
 .arrival-phrase{
   position:absolute;
+  z-index:1;
   left:0; right:0;
   top:14%;
   display:flex;
@@ -222,11 +257,12 @@ button{font-family:inherit;}
 /* mega number (material) */
 .mega-number{
   position:absolute;
+  z-index:2;
   left:50%; top:50%;
   transform:translate(-50%,-50%) scale(.7);
   font-family:'Cormorant Garamond', serif;
   font-weight:600;
-  font-size:clamp(5rem,32vw,13rem);
+  font-size:clamp(6rem,38vw,15rem);
   color:var(--navy);
   opacity:0;
   letter-spacing:.01em;
@@ -235,6 +271,10 @@ button{font-family:inherit;}
   pointer-events:none;
   white-space:nowrap;
 }
+.mega-number .mn-d{
+  display:inline-block;
+  transform:translateY(-.5em);
+}
 .mega-number small{
   font-size:.24em;
   vertical-align:.6em;
@@ -242,10 +282,23 @@ button{font-family:inherit;}
   font-family:'IBM Plex Sans Arabic',sans-serif;
   font-weight:600;
 }
+.mega-caption{
+  position:absolute;
+  z-index:3;
+  left:0; right:0;
+  bottom:9vh;
+  text-align:center;
+  font-family:'El Messiri',serif;
+  font-weight:600;
+  font-size:clamp(1rem,3.4vw,1.3rem);
+  color:var(--navy);
+  opacity:0;
+}
 
 /* value price (integrated, not a pill) */
 .value-price{
   position:absolute;
+  z-index:3;
   right:8vw;
   top:50%;
   transform:translateY(-50%) translateX(24px);
@@ -280,9 +333,10 @@ button{font-family:inherit;}
 .digit-roll{display:inline-block; overflow:hidden; vertical-align:bottom;}
 .digit-roll .d-in{display:inline-block; transition:transform .5s var(--ease-heavy);}
 
-/* progress rail */
+/* progress rail (subtle, replaces nothing visible but aids orientation) */
 .act-progress{
   position:absolute;
+  z-index:3;
   inset-inline-start:5vw;
   top:50%;
   transform:translateY(-50%);
@@ -354,6 +408,13 @@ button{font-family:inherit;}
 .rate-arrow{font-size:.7rem; margin-inline-start:.4rem;}
 .rate-arrow.up{color:var(--up);}
 .rate-arrow.down{color:var(--down);}
+.market-note{
+  max-width:520px;
+  margin:2rem auto 0;
+  text-align:center;
+  font-size:.78rem;
+  color:var(--navy-soft);
+}
 
 /* ================= PRODUCT TRANSFORM ================= */
 .transform-stage{
