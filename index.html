@@ -54,19 +54,28 @@
         <video id="videoB" muted playsinline preload="auto" src="scene3-gold-2.mp4"></video>
       </div>
       <div class="gold-stage-vignette"></div>
+      <div class="transition-flash" id="transitionFlash"></div>
     </div>
 
     <div class="brand-mark" id="brandMark">
-      <img src="alzuman-logo.png" alt="الزومان" class="brand-logo" id="brandLogo">
+      <div class="brand-emblem-crop">
+        <img src="alzuman-logo.png" alt="الزومان" class="brand-emblem" id="brandLogo">
+      </div>
+      <p class="brand-fall-wordmark" id="brandFallWordmark" aria-hidden="true">
+        <span class="bl">A</span><span class="bl">L</span><span class="bl">Z</span><span class="bl">U</span><span class="bl">M</span><span class="bl">A</span><span class="bl">N</span>
+      </p>
     </div>
 
     <div class="brand-cue" id="brandCue" aria-hidden="true"><span></span></div>
 
-    <p class="arrival-phrase" id="arrivalPhrase" aria-label="ذهبٌ بقيمته">
-      <span class="aw"><i>ذهبٌ</i></span><span class="aw"><i>بقيمته</i></span>
+    <p class="arrival-phrase" id="arrivalPhrase" aria-label="للقيمة وزن">
+      <span class="aw"><i>للقيمة</i></span><span class="aw"><i>وزن</i></span>
     </p>
 
-    <p class="mega-number" id="megaNumber">999<small>٫٩</small></p>
+    <p class="mega-number" id="megaNumber" aria-label="999.9">
+      <span class="mn-d">9</span><span class="mn-d">9</span><span class="mn-d">9</span><small>٫٩</small>
+    </p>
+    <p class="mega-caption" id="megaCaption">ذهب نقي</p>
 
     <div class="value-price" id="valuePrice">
       <span class="value-price-eyebrow">القيمة الآن</span>
@@ -84,26 +93,27 @@
   <h2 class="market-title">نقاءٌ لا يحتاج إلى مبالغة</h2>
   <div class="rate-list">
     <div class="rate-row" data-rate>
-      <span class="rate-label">غرام الذهب</span>
-      <span class="rate-value num" id="rateGram" dir="ltr">—</span>
+      <span class="rate-label">عيار ٢٤</span>
+      <span class="rate-value num" id="rate24k" dir="ltr">—</span>
     </div>
     <div class="rate-row" data-rate>
-      <span class="rate-label">٥ غرامات</span>
-      <span class="rate-value num" id="rate5g" dir="ltr">—</span>
+      <span class="rate-label">عيار ٢٢</span>
+      <span class="rate-value num" id="rate22k" dir="ltr">—</span>
     </div>
     <div class="rate-row" data-rate>
-      <span class="rate-label">١٠ غرامات</span>
-      <span class="rate-value num" id="rate10g" dir="ltr">—</span>
+      <span class="rate-label">عيار ٢١</span>
+      <span class="rate-value num" id="rate21k" dir="ltr">—</span>
     </div>
     <div class="rate-row" data-rate>
-      <span class="rate-label">الأونصة</span>
-      <span class="rate-value num" id="rateOunceSar" dir="ltr">—</span>
+      <span class="rate-label">عيار ١٨</span>
+      <span class="rate-value num" id="rate18k" dir="ltr">—</span>
     </div>
     <div class="rate-row ounce" data-rate>
       <span class="rate-label">سعر الأونصة العالمي <span class="rate-arrow" id="ounceArrow">—</span></span>
       <span class="rate-value num" id="rateOunceUsd" dir="ltr">—</span>
     </div>
   </div>
+  <p class="market-note">الأسعار للغرام الواحد، محسوبة من سعر الأونصة العالمي الحالي.</p>
 </section>
 
 <!-- ============ PRODUCT TRANSFORMATION ============ -->
