@@ -7,7 +7,7 @@
 <meta name="description" content="الزومان — سبائك ذهب عيار ٩٩٩.٩ من بريدة، السعودية. رقم تسلسلي فريد وشهادة أصالة لكل سبيكة.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -46,27 +46,25 @@
 <div class="pin-stage" id="pinStage">
   <div class="pin-inner">
 
-    <div class="gold-stage" aria-hidden="true">
+    <div class="gold-frame" id="goldFrame" aria-hidden="true">
       <div class="gold-video-layer" id="goldLayerA">
-        <video id="videoA" muted playsinline preload="auto" src="scene1-ivory-2.mp4"></video>
+        <video id="videoA" autoplay muted playsinline loop preload="auto" src="scene1-ivory-2.mp4"></video>
       </div>
       <div class="gold-video-layer" id="goldLayerB">
-        <video id="videoB" muted playsinline preload="auto" src="scene3-gold-2.mp4"></video>
+        <video id="videoB" autoplay muted playsinline loop preload="auto" src="scene3-gold-2.mp4"></video>
       </div>
-      <div class="gold-stage-vignette"></div>
       <div class="transition-flash" id="transitionFlash"></div>
     </div>
+    <div class="scroll-peek" id="scrollPeek" aria-hidden="true"></div>
 
     <div class="brand-mark" id="brandMark">
-      <div class="brand-emblem-crop">
-        <img src="alzuman-logo.png" alt="الزومان" class="brand-emblem" id="brandLogo">
-      </div>
-      <p class="brand-fall-wordmark" id="brandFallWordmark" aria-hidden="true">
-        <span class="bl">A</span><span class="bl">L</span><span class="bl">Z</span><span class="bl">U</span><span class="bl">M</span><span class="bl">A</span><span class="bl">N</span>
-      </p>
+      <img src="alzuman-logo.png" alt="الزومان" class="brand-emblem" id="brandLogo">
     </div>
 
-    <div class="brand-cue" id="brandCue" aria-hidden="true"><span></span></div>
+    <div class="scroll-invite" id="scrollInvite" aria-hidden="true">
+      <span class="scroll-invite-text">مرّر لاكتشاف الذهب</span>
+      <span class="scroll-invite-rail"><i></i></span>
+    </div>
 
     <p class="arrival-phrase" id="arrivalPhrase" aria-label="للقيمة وزن">
       <span class="aw"><i>للقيمة</i></span><span class="aw"><i>وزن</i></span>
@@ -119,8 +117,8 @@
 <!-- ============ PRODUCT TRANSFORMATION ============ -->
 <div class="transform-stage" id="transformStage">
   <div class="transform-inner">
-    <div class="gold-video-layer" id="transformVideoLayer" style="position:absolute;inset:0;">
-      <video id="videoC" muted playsinline preload="auto" src="scene2-sand-2.mp4" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></video>
+    <div class="transform-frame" id="transformFrame">
+      <video id="videoC" autoplay muted playsinline loop preload="auto" src="scene2-sand-2.mp4"></video>
     </div>
     <div class="transform-bar" id="transformBar" style="opacity:0;"></div>
     <p class="transform-caption" id="transformCaption">من سبيكةٍ واحدة، إلى مجموعة كاملة</p>
@@ -129,7 +127,7 @@
 
 <!-- ============ SHOP ============ -->
 <section class="shop-section" id="shop">
-  <h2 class="shop-title">السبائك</h2>
+  <h2 class="shop-title"><span class="mask-line"><i id="shopTitleWord">السبائك</i></span></h2>
   <p class="shop-sub">خمس سبائك، بعيار ٩٩٩.٩، لكل وزنٍ حضوره.</p>
 
   <div id="productList"></div>
