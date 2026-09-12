@@ -1,0 +1,420 @@
+/* ===========================================================
+   ALZUMAN — premium Saudi gold bullion, editorial build
+   One cinematic video (hero only). Everything after: composition,
+   typography, real bullion photography, macro crop, live pricing.
+=========================================================== */
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ background:#F4EFE7; }
+
+:root{
+  --ivory:#F4EFE7;
+  --light:#F8F5EF;
+  --champagne:#E8DECF;
+  --beige-2:#DDD0BE;
+  --taupe:#877B73;
+  --taupe-deep:#6D635D;
+  --ink:#211C18;
+  --ink-muted:#675E57;
+  --hairline:rgba(33,28,24,0.14);
+  --hairline-inverse:rgba(248,245,239,0.22);
+  --gold:#C5A153;
+  --gold-soft:#D8BF86;
+  --up:#66705E;
+  --down:#866761;
+
+  --font-kufi:'29LT Bukra','DIN Next Arabic','Noto Kufi Arabic',sans-serif;
+  --font-ar:'IBM Plex Sans Arabic',sans-serif;
+  --font-en:'Cormorant Garamond',serif;
+  --font-num:'Inter Tight',sans-serif;
+
+  --fs-major: clamp(4.5rem, 8vw, 8rem);
+  --fs-section: clamp(3rem, 5.5vw, 5.6rem);
+  --fs-numeral: clamp(4rem, 8vw, 8rem);
+  --fs-price: clamp(2.3rem, 8.5vw, 4.8rem);
+  --fs-body: clamp(1rem, 0.4vw + 0.92rem, 1.0625rem);
+  --fs-micro: 0.6875rem;
+
+  --gutter: 6vw;
+}
+
+@media (max-width:720px){
+  :root{
+    --fs-major: clamp(2.6rem, 13vw, 4.6rem);
+    --fs-section: clamp(2rem, 10vw, 3.4rem);
+    --fs-numeral: clamp(3rem, 24vw, 7rem);
+    --fs-body: 1rem;
+  }
+}
+
+body{
+  background:var(--ivory);
+  color:var(--ink);
+  font-family:var(--font-ar);
+  font-weight:400;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+.micro{
+  font-family:var(--font-en);
+  font-size:var(--fs-micro);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--taupe-deep);
+  font-weight:600;
+  direction:ltr;
+  display:inline-block;
+}
+
+.num{ font-family:var(--font-num); font-variant-numeric:tabular-nums; font-feature-settings:'tnum'; direction:ltr; }
+
+img{ display:block; max-width:100%; }
+
+a{ color:inherit; text-decoration:none; }
+
+section{ position:relative; }
+
+[data-reveal]{ opacity:0; transform:translateY(22px); }
+
+/* ============ HEADER ============ */
+.site-header{
+  position:fixed; top:0; left:0; right:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1.1rem var(--gutter);
+  background:transparent;
+  transition:background .3s ease;
+}
+.header-btn{
+  background:none; border:0; color:var(--ink); cursor:pointer;
+  width:2.2rem; height:2.2rem; display:flex; align-items:center; justify-content:center;
+}
+.header-mark{ opacity:0; transform:translateY(6px); }
+.header-mark img{ height:1.5rem; width:auto; }
+.header-group{ display:flex; gap:.6rem; }
+
+.mobile-menu{
+  position:fixed; inset:0; z-index:100; background:var(--light);
+  display:flex; flex-direction:column; align-items:flex-end; justify-content:center;
+  gap:1.6rem; padding:0 10vw;
+  transform:translateY(-100%); transition:transform .5s cubic-bezier(.7,0,.2,1);
+}
+.mobile-menu.open{ transform:translateY(0); }
+.mobile-menu-close{ position:absolute; top:1.1rem; left:var(--gutter); }
+.mobile-menu a{
+  font-family:var(--font-kufi); font-weight:600;
+  font-size:clamp(1.6rem,6vw,2.4rem); color:var(--ink);
+}
+
+/* ============ SECTION 1 — CINEMATIC OPENING HERO ============ */
+.pin-stage{ position:relative; }
+.pin-inner{
+  position:sticky; top:0; height:100svh; height:100dvh; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--ivory);
+}
+
+.s1-bgsymbol{
+  position:absolute; z-index:0; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:100vw; max-width:760px; aspect-ratio:1;
+  background-image:url('/assets/alzuman-logo.png');
+  background-repeat:no-repeat; background-position:center; background-size:contain;
+  filter:grayscale(1) contrast(0) brightness(.25);
+  opacity:.035;
+  pointer-events:none;
+}
+@media (max-width:720px){
+  .s1-bgsymbol{ width:112vw; max-width:none; }
+}
+
+.s1-video{
+  position:relative; z-index:1;
+  width:clamp(480px, 64vw, 820px);
+  aspect-ratio:9/16;
+  overflow:hidden;
+}
+@media (max-width:720px){
+  .s1-video{ width:clamp(260px, 80vw, 380px); }
+}
+.s1-video video{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+}
+
+.s1-logo{
+  position:absolute; z-index:3; left:50%; top:11vh; transform:translate(-50%,0);
+  width:16vw; max-width:220px; min-width:120px; opacity:0;
+}
+@media (max-width:720px){
+  .s1-logo{ width:38vw; top:9vh; }
+}
+.s1-sub-micro{
+  position:absolute; z-index:3; left:0; right:0; bottom:15vh; text-align:center; opacity:0;
+}
+.s1-sub{
+  position:absolute; z-index:3; left:0; right:0; bottom:10.5vh; text-align:center;
+  font-family:var(--font-ar); font-size:1rem; font-weight:500; color:var(--ink-muted); opacity:0;
+}
+.s1-scrollcue{
+  position:absolute; z-index:3; left:0; right:0; bottom:3.4vh;
+  display:flex; flex-direction:column; align-items:center; gap:.5rem; opacity:0;
+}
+.s1-scrollcue span{ font-family:var(--font-en); font-size:.75rem; letter-spacing:.1em; color:var(--taupe-deep); }
+.s1-scrollcue i{
+  width:1px; height:22px; background:var(--taupe);
+  position:relative; overflow:hidden;
+}
+.s1-scrollcue i::after{
+  content:''; position:absolute; left:0; top:-100%; width:100%; height:100%; background:var(--ink);
+  animation:cueDrop 1.8s ease-in-out infinite;
+}
+@keyframes cueDrop{ 0%{ top:-100%; } 60%{ top:100%; } 100%{ top:100%; } }
+
+/* ============ generic section paddings ============ */
+.s2-section,.s3-section,.s4-section,.s6-section,.s7-section,.s8-section,.s9-section{
+  position:relative; background:var(--ivory);
+  padding:min(22vh,11rem) var(--gutter);
+}
+
+/* ============ SECTION 2 — ALZUMAN STATEMENT ============ */
+.s2-section{ padding-bottom:min(18vh,9rem); overflow:hidden; }
+.s2-micro{ display:block; margin-bottom:1.6rem; position:relative; z-index:3; }
+.s2-hero{ position:relative; }
+.s2-headline{
+  position:relative; z-index:1;
+  font-family:var(--font-kufi); font-weight:700; color:var(--ink);
+  font-size:var(--fs-major); line-height:.98;
+  text-align:right; margin-inline-end:auto; max-width:22ch;
+}
+.s2-headline .line{ display:block; overflow:hidden; }
+.s2-headline .line span{ display:block; transform:translateY(110%); transition:transform .9s cubic-bezier(.16,1,.3,1); }
+.s2-headline .line.in span{ transform:translateY(0); }
+.s2-product{
+  position:absolute; z-index:2; right:32%; top:58%;
+  width:min(34vw,260px);
+  transform:translateY(-14%);
+}
+.s2-product img{ width:100%; height:auto; }
+.s2-body{
+  position:relative; z-index:1;
+  margin-top:min(9vh,4.5rem); margin-inline-end:auto; max-width:34ch; text-align:right;
+  font-size:var(--fs-body); color:var(--ink-muted); font-weight:400;
+}
+@media (max-width:820px){
+  .s2-headline{ max-width:none; }
+  .s2-body{ max-width:none; margin-top:6.5rem; }
+  .s2-product{ width:52vw; right:6vw; top:56%; }
+}
+
+/* ============ SECTION 3 — BULLION PRODUCT STATEMENT ============ */
+.s3-section{
+  min-height:100svh; display:flex; align-items:center;
+  overflow:hidden; padding-top:min(14vh,7rem); padding-bottom:min(14vh,7rem);
+  background:var(--light);
+}
+.s3-micro{ position:absolute; z-index:3; top:8vh; inset-inline-start:var(--gutter); }
+.s3-hero{ position:relative; width:100%; min-height:min(68vh,660px); display:flex; align-items:center; }
+.s3-headline{
+  position:relative; z-index:1;
+  font-family:var(--font-kufi); font-weight:700; color:var(--ink);
+  font-size:var(--fs-major); line-height:.98; text-align:right;
+  margin-inline-end:auto; max-width:16ch;
+}
+.s3-bar{
+  position:absolute; z-index:2; inset-inline-start:2vw; top:50%; transform:translateY(-50%);
+  height:min(66vh,640px); width:auto;
+}
+.s3-bar img{ height:100%; width:auto; }
+.s3-cycler{
+  position:absolute; z-index:3; bottom:6vh; inset-inline-end:var(--gutter);
+  height:2.2em; overflow:hidden;
+}
+.s3-cycler span{
+  display:block; font-size:var(--fs-body); color:var(--ink-muted); opacity:0;
+  transition:opacity .6s ease, transform .6s ease; transform:translateY(10px);
+}
+.s3-cycler span.active{ opacity:1; transform:translateY(0); }
+@media (max-width:820px){
+  .s3-section{ align-items:flex-start; padding-top:16vh; }
+  .s3-hero{ min-height:0; display:block; }
+  .s3-headline{ max-width:none; font-size:clamp(2.6rem,11vw,3.6rem); }
+  .s3-bar{ position:relative; inset-inline-start:auto; top:auto; transform:none; height:min(52vh,440px); margin:3rem auto 0; display:block; }
+  .s3-cycler{ position:static; margin-top:2.4rem; text-align:center; }
+}
+
+/* ============ SECTION 4 — PURITY / MACRO DETAIL ============ */
+.s4-section{ background:var(--champagne); }
+.s4-hero{ position:relative; }
+.s4-macro{
+  width:68vw; max-width:1040px; margin-inline-start:auto;
+  aspect-ratio:16/9; overflow:hidden;
+}
+.s4-macro img{ width:100%; height:100%; object-fit:cover; }
+.s4-num{
+  position:absolute; z-index:2; left:0; bottom:-6%;
+  display:block; font-family:var(--font-num); font-weight:600;
+  font-size:var(--fs-numeral); line-height:.85; color:var(--ink);
+}
+.s4-label{
+  position:absolute; z-index:2; left:0; top:6%;
+  display:block; font-family:var(--font-kufi); font-weight:600; font-size:1.4rem;
+}
+.s4-text p{
+  margin-top:2.4rem; max-width:30ch; margin-inline-end:auto; text-align:right;
+  font-size:var(--fs-body); color:var(--ink-muted); line-height:1.55;
+}
+@media (max-width:820px){
+  .s4-macro{ width:112vw; margin:0 -6vw; aspect-ratio:16/11; }
+  .s4-num{ position:static; margin-top:1.4rem; }
+  .s4-label{ position:static; display:block; margin-top:2.2rem; }
+  .s4-text p{ margin-inline-end:0; max-width:none; text-align:center; }
+}
+
+/* ============ SECTION 5 — LIVE GOLD INDEX ============ */
+.s5-section{ background:var(--light); padding:min(20vh,10rem) var(--gutter); }
+.s5-head h2{
+  font-family:var(--font-kufi); font-weight:700; font-size:var(--fs-section); line-height:1.02; color:var(--ink);
+}
+.s5-head .micro{ display:block; margin-bottom:1rem; }
+.s5-rule{ margin-top:3.4rem; height:1px; background:var(--hairline); transform-origin:right center; transform:scaleX(0); }
+.price-ounce-row{
+  padding:1.4rem 0; border-bottom:1px solid var(--hairline);
+  display:flex; align-items:baseline; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+}
+.price-ounce-row .label{ font-size:var(--fs-body); color:var(--ink-muted); }
+.value-group{ display:flex; align-items:baseline; gap:.8rem; direction:ltr; }
+.value-group .val{ font-size:clamp(1.6rem,4vw,2.4rem); font-weight:600; }
+.trend{ font-size:.85rem; color:var(--ink-muted); }
+.trend.up{ color:var(--up); }
+.trend.down{ color:var(--down); }
+
+.price-grid{
+  margin-top:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.price-cell{
+  display:flex; flex-direction:column; gap:.5rem; padding:2.2rem 1.2rem;
+  border-inline-end:1px solid var(--hairline);
+  text-align:center; min-width:0;
+}
+.price-cell:last-child{ border-inline-end:0; }
+.price-cell .karat{ font-family:var(--font-en); font-size:.95rem; color:var(--ink-muted); }
+.price-cell .val{ font-size:clamp(1.8rem,4.2vw,var(--fs-price)); font-weight:600; line-height:1; }
+.price-cell .unit{ font-family:var(--font-en); font-size:.78rem; color:var(--taupe); letter-spacing:.05em; }
+@media (max-width:900px){
+  .price-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .price-cell{ padding:1.6rem .6rem; border-bottom:1px solid var(--hairline); }
+  .price-cell:nth-child(2){ border-inline-end:0; }
+  .price-cell:nth-child(-n+2){ border-inline-end:1px solid var(--hairline); }
+  .price-cell:nth-last-child(-n+2){ border-bottom:0; }
+  .price-cell .val{ font-size:clamp(1.7rem,7vw,2.8rem); }
+}
+.s5-note{ margin-top:1.6rem; font-size:.82rem; color:var(--taupe); }
+
+/* ============ SECTION 6 — BRAND VALUE ============ */
+.s6-section{ overflow:hidden; }
+.s6-bgsymbol{
+  position:absolute; z-index:0; right:-16vw; top:50%; transform:translateY(-50%);
+  width:60vw; max-width:640px; aspect-ratio:1;
+  background-image:url('/assets/alzuman-logo.png');
+  background-repeat:no-repeat; background-position:center; background-size:contain;
+  filter:grayscale(1) contrast(0) brightness(.25); opacity:.04; pointer-events:none;
+}
+.s6-section > *{ position:relative; z-index:1; }
+.s6-section .micro{ display:block; margin-bottom:1.4rem; }
+.s6-section h2{ font-family:var(--font-kufi); font-weight:700; font-size:var(--fs-major); line-height:1; max-width:14ch; }
+.s6-body{ margin-top:1.6rem; max-width:38ch; font-size:var(--fs-body); color:var(--ink-muted); }
+.s6-values{ margin-top:4.5rem; max-width:44rem; }
+.s6-value{
+  display:flex; align-items:center; gap:1.6rem; padding:1.5rem 0; border-top:1px solid var(--hairline);
+}
+.s6-values .s6-value:last-child{ border-bottom:1px solid var(--hairline); }
+.s6-num{ font-family:var(--font-num); font-size:.9rem; color:var(--taupe); min-width:2ch; }
+.s6-txt{ font-family:var(--font-kufi); font-weight:600; font-size:clamp(1.2rem,2.6vw,1.7rem); }
+
+/* ============ SECTION 7 — HOW TO BUY ============ */
+.s7-section{ background:var(--light); }
+.s7-head h2{ font-family:var(--font-kufi); font-weight:700; font-size:var(--fs-section); line-height:1.02; }
+.s7-head p{ margin-top:1.2rem; font-size:var(--fs-body); color:var(--ink-muted); }
+.s7-steps{ margin-top:4rem; }
+.s7-step{
+  display:flex; align-items:baseline; gap:2rem; padding:1.7rem 0; border-top:1px solid var(--hairline);
+}
+.s7-steps .s7-step:last-child{ border-bottom:1px solid var(--hairline); }
+.s7-idx{ font-family:var(--font-num); font-size:1rem; color:var(--taupe); min-width:2.4ch; }
+.s7-txt{ font-family:var(--font-kufi); font-weight:600; font-size:clamp(1.15rem,2.4vw,1.55rem); }
+@media (min-width:900px){
+  .s7-steps{ display:grid; grid-template-columns:repeat(5,1fr); gap:0 1.4rem; }
+  .s7-step{ flex-direction:column; align-items:flex-start; gap:.9rem; border-top:0; border-inline-start:1px solid var(--hairline); padding:0 1.4rem; }
+  .s7-steps .s7-step:last-child{ border-bottom:0; }
+}
+
+/* ============ SECTION 8 — PRODUCT COLLECTION ============ */
+.s8-head h2{ font-family:var(--font-kufi); font-weight:700; font-size:var(--fs-section); margin-top:1rem; }
+.s8-head .micro{ display:block; }
+.s8-head p{ margin-top:1.2rem; font-size:var(--fs-body); color:var(--ink-muted); }
+
+.product-gallery{ margin-top:4rem; display:flex; flex-direction:column; }
+.product-row{
+  display:flex; align-items:center; gap:5vw; padding:3.2rem 0; border-top:1px solid var(--hairline);
+}
+.product-gallery .product-row:last-child{ border-bottom:1px solid var(--hairline); }
+.product-row:nth-child(even){ flex-direction:row-reverse; }
+.product-visual{ flex:0 0 34%; max-width:300px; overflow:hidden; }
+.product-visual img{ width:100%; height:auto; transition:transform .5s ease; }
+.product-row:hover .product-visual img{ transform:scale(1.02); }
+.product-row.feature .product-visual{ flex-basis:46%; max-width:400px; }
+.product-info{ flex:1; text-align:right; }
+.product-weight{ display:block; font-family:var(--font-kufi); font-weight:700; font-size:clamp(1.6rem,4vw,2.6rem); }
+.product-row.feature .product-weight{ font-size:clamp(2rem,5.6vw,3.6rem); }
+.product-purity{ display:block; margin-top:.5rem; font-size:.85rem; color:var(--taupe); }
+.product-price{ display:block; margin-top:1.1rem; font-size:clamp(1.3rem,2.6vw,1.8rem); font-weight:600; }
+.product-stock{ display:block; margin-top:.3rem; font-size:.82rem; color:var(--up); }
+.product-cta{
+  display:inline-block; margin-top:1.3rem; font-family:var(--font-en); font-size:.95rem; letter-spacing:.03em;
+  border-bottom:1px solid var(--ink); padding-bottom:2px; transition:opacity .3s ease;
+}
+.product-row:hover .product-cta{ opacity:.6; }
+@media (max-width:760px){
+  .product-row, .product-row:nth-child(even){ flex-direction:column; align-items:flex-start; gap:1.6rem; }
+  .product-visual, .product-row.feature .product-visual{ flex-basis:auto; max-width:60vw; }
+  .product-info{ text-align:right; width:100%; }
+}
+
+/* ============ SECTION 9 — FINAL BRAND MOMENT ============ */
+.s9-section{
+  min-height:80svh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; overflow:hidden;
+}
+.s9-bgsymbol{
+  position:absolute; z-index:0; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:52vw; max-width:520px; aspect-ratio:1;
+  background-image:url('/assets/alzuman-logo.png');
+  background-repeat:no-repeat; background-position:center; background-size:contain;
+  filter:grayscale(1) contrast(0) brightness(.25); opacity:.045; pointer-events:none;
+}
+.s9-section > *{ position:relative; z-index:1; }
+.s9-section h2{ font-family:var(--font-kufi); font-weight:700; font-size:var(--fs-major); line-height:1; }
+.s9-section p{ margin-top:1.4rem; max-width:38ch; font-size:var(--fs-body); color:var(--ink-muted); }
+.s9-cta{
+  display:inline-block; margin-top:2.6rem; font-family:var(--font-en); font-size:1.05rem; letter-spacing:.04em;
+  padding-bottom:4px; border-bottom:1px solid var(--ink);
+}
+
+/* ============ FOOTER ============ */
+.site-footer{ background:var(--ivory); padding:5rem var(--gutter) 2.4rem; border-top:1px solid var(--hairline); }
+.footer-logo{ height:1.5rem; width:auto; margin-bottom:3rem; }
+.footer-cols{ display:grid; grid-template-columns:repeat(6,1fr); gap:2rem; }
+.footer-col{ display:flex; flex-direction:column; gap:.7rem; }
+.footer-col-title{ font-family:var(--font-en); font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--taupe); margin-bottom:.3rem; }
+.footer-col a, .footer-col p{ font-size:.88rem; color:var(--ink-muted); }
+.footer-bottom{ margin-top:3.4rem; padding-top:1.4rem; border-top:1px solid var(--hairline); font-size:.78rem; color:var(--taupe); }
+@media (max-width:760px){
+  .footer-cols{ grid-template-columns:repeat(2,1fr); }
+}
+
+/* ============ reduced motion ============ */
+@media (prefers-reduced-motion: reduce){
+  [data-reveal], .s2-headline .line span, .s1-logo, .s1-sub, .s1-sub-micro, .s1-scrollcue, .s1-video, .s5-rule{
+    opacity:1 !important; transform:none !important;
+  }
+  .s1-scrollcue i::after{ animation:none; }
+}
