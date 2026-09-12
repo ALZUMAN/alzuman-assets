@@ -5,15 +5,18 @@
   var mapRange = function(p,a,b){ return clamp((p-a)/(b-a),0,1); };
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ============ pricing engine (reused) ============ */
+  /* ============ pricing engine ============ */
   var OUNCE_GRAMS = 31.1035;
   var SAR_PER_USD = 3.75;
   var WEIGHTS = [
-    {label:'١ غرام',  grams:1,        dims:'8 × 15 × 0.4',  visualW:34,  visualH:52},
-    {label:'٢ غرام',  grams:2,        dims:'11 × 19 × 0.5', visualW:44,  visualH:66},
-    {label:'٥ غرامات', grams:5,        dims:'14 × 23 × 0.7', visualW:56,  visualH:82},
-    {label:'١٠ غرامات', grams:10,       dims:'17 × 28 × 0.9', visualW:68,  visualH:98},
-    {label:'أونصة (٣١.١٠٣٥غ)', grams:OUNCE_GRAMS, dims:'24 × 41 × 1.9', visualW:96,  visualH:140}
+    {label:'١ غرام',     grams:1,          dims:'8 × 15 × 0.4 مم'},
+    {label:'٢.٥ غرام',   grams:2.5,        dims:'10 × 17 × 0.5 مم'},
+    {label:'٥ غرامات',   grams:5,          dims:'14 × 23 × 0.7 مم'},
+    {label:'١٠ غرامات',  grams:10,         dims:'17 × 28 × 0.9 مم'},
+    {label:'٢٠ غراماً',  grams:20,         dims:'21 × 33 × 1.2 مم'},
+    {label:'٥٠ غراماً',  grams:50,         dims:'28 × 45 × 1.6 مم'},
+    {label:'١٠٠ غرام',   grams:100,        dims:'34 × 55 × 2.1 مم'},
+    {label:'أونصة واحدة', grams:OUNCE_GRAMS, dims:'24 × 41 × 1.9 مم'}
   ];
   var ouncePrice = 4183.40;
 
@@ -26,39 +29,40 @@
   function priceForGrams(grams){
     return ((ouncePrice + 50) / OUNCE_GRAMS) * SAR_PER_USD * grams;
   }
+  function priceForKarat(karat){
+    return priceForGrams(1) * (karat / 24);
+  }
 
-  /* ============ product list (shop) ============ */
-  var productListEl = document.getElementById('productList');
+  /* ============ section 8: product grid ============ */
+  var s8Items = document.getElementById('s8Items');
   var priceEls = [];
   WEIGHTS.forEach(function(w){
     var row = document.createElement('div');
-    row.className = 'product-row';
+    row.className = 's8-item';
     row.innerHTML =
-      '<div class="product-visual" style="width:'+w.visualW+'px;height:'+w.visualH+'px;"><div class="shine"></div></div>' +
-      '<div class="product-info">' +
-        '<div class="product-weight">'+w.label+'</div>' +
-        '<span class="product-dims" dir="ltr">'+w.dims+' مم</span>' +
-        '<span class="product-price num" dir="ltr"></span>' +
-        '<a href="tel:0562658444" class="product-cta">اطلب الآن ←</a>' +
+      '<div class="bullion-bar" style="--bar-w:88px;--bar-h:52px;"><div class="bullion-bar-face">' +
+        '<span class="bullion-bar-purity" style="font-size:.6rem;">999.9</span>' +
+      '</div></div>' +
+      '<div class="s8-item-info">' +
+        '<span class="s8-item-weight">'+w.label+'</span>' +
+        '<span class="s8-item-purity">عيار ٩٩٩.٩ · '+w.dims+'</span>' +
+        '<span class="s8-item-price num"></span>' +
+        '<span class="s8-item-stock">متوفر</span>' +
+        '<a href="tel:0562658444" class="s8-item-cta">عرض السبيكة ←</a>' +
       '</div>';
-    productListEl.appendChild(row);
-    priceEls.push({el:row.querySelector('.product-price'), grams:w.grams});
+    s8Items.appendChild(row);
+    priceEls.push({el:row.querySelector('.s8-item-price'), grams:w.grams});
   });
 
-  /* ============ market (karat) + value DOM refs ============ */
+  /* ============ DOM refs: pricing ============ */
   var rate24kEl = document.getElementById('rate24k');
   var rate22kEl = document.getElementById('rate22k');
   var rate21kEl = document.getElementById('rate21k');
   var rate18kEl = document.getElementById('rate18k');
   var rateOunceUsdEl = document.getElementById('rateOunceUsd');
   var ounceArrowEl = document.getElementById('ounceArrow');
-  var valueAmountEl = document.getElementById('valueAmount');
-
-  // karat rates are the same live-ticking ounce price, expressed at each
-  // karat's fraction of 24K (999.9) purity — not a separate data source.
-  function priceForKarat(karat){
-    return priceForGrams(1) * (karat / 24);
-  }
+  var tickerOunceEl = document.getElementById('tickerOunce');
+  var tickerArrowEl = document.getElementById('tickerArrow');
 
   function renderPrices(direction){
     rate24kEl.textContent = formatSAR(priceForKarat(24));
@@ -66,13 +70,15 @@
     rate21kEl.textContent = formatSAR(priceForKarat(21));
     rate18kEl.textContent = formatSAR(priceForKarat(18));
     rateOunceUsdEl.textContent = formatUSD(ouncePrice);
-    valueAmountEl.textContent = formatSAR(priceForGrams(1));
+    tickerOunceEl.textContent = formatUSD(ouncePrice);
     priceEls.forEach(function(p){ p.el.textContent = formatSAR(priceForGrams(p.grams)); });
 
-    ounceArrowEl.classList.remove('up','down');
-    if (direction === 'up'){ ounceArrowEl.classList.add('up'); ounceArrowEl.textContent = '▲'; }
-    else if (direction === 'down'){ ounceArrowEl.classList.add('down'); ounceArrowEl.textContent = '▼'; }
-    else { ounceArrowEl.textContent = '—'; }
+    [ounceArrowEl, tickerArrowEl].forEach(function(el){
+      el.classList.remove('up','down');
+      if (direction === 'up'){ el.classList.add('up'); el.textContent = '▲'; }
+      else if (direction === 'down'){ el.classList.add('down'); el.textContent = '▼'; }
+      else { el.textContent = '—'; }
+    });
   }
 
   function updatePrice(){
@@ -96,48 +102,22 @@
   menuCloseBtn.addEventListener('click', closeMenu);
   mobileMenu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeMenu); });
 
-  /* ============ video autoplay (native timing — never seeked by scroll) ============ */
-  var heroVideo = document.getElementById('heroVideo');
-  var videoC = document.getElementById('videoC');
-  [heroVideo, videoC].forEach(function(v){ v.play().catch(function(){}); });
-
   /* ============ reduced motion: static fallback ============ */
   if (reduceMotion || !window.gsap || !window.ScrollTrigger){
-    siteHeader.style.background = 'rgba(247,243,236,.86)';
-    siteHeader.style.backdropFilter = 'blur(10px)';
+    siteHeader.style.background = 'rgba(245,240,232,.9)';
     document.getElementById('headerWordmark').style.opacity = 1;
     document.getElementById('headerWordmark').style.transform = 'translateY(0)';
-    ['arrivalPhrase','megaNumber','megaCaption','valuePrice'].forEach(function(id){
-      document.getElementById(id).style.opacity = 1;
+    document.getElementById('s1Logo').style.opacity = 1;
+    document.getElementById('s1Logo').style.transform = 'none';
+    document.querySelectorAll('[data-reveal], .s3-item, .s7-value, .s8-item').forEach(function(el){
+      el.style.opacity = 1; el.style.transform = 'none';
     });
-    document.querySelectorAll('.aw i, .mask-line i').forEach(function(i){ i.style.transform = 'translateY(0)'; });
-    document.querySelectorAll('.mn-d').forEach(function(d){ d.style.transform = 'translateY(0)'; });
-    document.getElementById('brandLogo').style.opacity = 1;
-    document.getElementById('brandLogo').style.transform = 'scale(1)';
-    document.getElementById('transformFrame').style.opacity = 0;
-    document.getElementById('transformBar').style.opacity = 1;
-    document.getElementById('transformCaption').style.opacity = 1;
-    document.querySelectorAll('[data-rate]').forEach(function(r){ r.style.opacity = 1; r.style.transform = 'none'; });
     return;
   }
 
   gsap.registerPlugin(ScrollTrigger);
 
-  var brandMark = document.getElementById('brandMark');
-  var scrollInvite = document.getElementById('scrollInvite');
-  var brandLogo = document.getElementById('brandLogo');
-  var headerWordmark = document.getElementById('headerWordmark');
-  var arrivalWords = document.querySelectorAll('#arrivalPhrase .aw i');
-  var megaNumber = document.getElementById('megaNumber');
-  var megaDigits = document.querySelectorAll('#megaNumber .mn-d');
-  var megaCaption = document.getElementById('megaCaption');
-  var valuePrice = document.getElementById('valuePrice');
-  var actProgressDot = document.getElementById('actProgressDot');
-
   function ease(name, t){ return gsap.parseEase(name)(clamp(t,0,1)); }
-
-  // generic continuous keyframe interpolator: points = [[progress, value], ...],
-  // eased between each pair so nothing ever snaps and reverse-scroll is exact.
   function kf(p, points){
     for (var i = 0; i < points.length - 1; i++){
       var a = points[i], b = points[i + 1];
@@ -149,121 +129,126 @@
     return points[points.length - 1][1];
   }
 
-  // scene boundaries (fractions of pin-stage progress, matching the 0-60% overall storyline)
-  var BRAND_END = 0.20;
-  var ARRIVAL_END = 0.467;
-  var MAT_A_END = 0.60;
-  var MAT_END = 0.75;
-  var VALUE_END = 1.0;
+  /* ============ SECTION 1: cold open — logo settle + header solidify ============ */
+  var s1Logo = document.getElementById('s1Logo');
+  var s1BarWrap = document.getElementById('s1BarWrap');
+  var headerWordmark = document.getElementById('headerWordmark');
 
-  /* ============ ACT I master scrub: Brand -> Arrival -> Material -> Value ============ */
-  ScrollTrigger.create({
-    trigger: '#pinStage',
-    start: 'top top',
-    end: 'bottom bottom',
-    pin: '.pin-inner',
-    scrub: 0.4,
-    onUpdate: function(self){ renderAct(self.progress); }
-  });
-
-  // BRAND FORMATION: plays once automatically on load — the first screen must
-  // already read as ALZUMAN before the visitor does anything, not after they scroll.
-  // Uses the supplied logo exactly as designed (its own typography, not a substitute font).
-  gsap.set(brandLogo, {opacity:0, scale:0.9, transformOrigin:'50% 50%'});
-  gsap.to(brandLogo, {opacity:1, scale:1, duration:0.95, ease:'power3.out', delay:0.1});
-
-  function renderAct(p){
-    // scroll cue fades once the visitor actually starts scrolling
-    var cueOpacity = 1 - mapRange(p, 0.035, 0.09);
-    scrollInvite.style.opacity = cueOpacity;
-
-    // ARRIVAL: whole brand mark migrates toward header (continuous scale + position,
-    // never an abrupt swap), header solidifies smoothly, phrase rises
-    var arriveT = mapRange(p, BRAND_END, ARRIVAL_END);
-    var arriveEase = ease('power3.inOut', arriveT);
-    var markScale = 1 - arriveEase * 0.72;
-    var markY = arriveEase * -38;
-    brandMark.style.transform = 'translateY(' + markY + 'vh) scale(' + markScale + ')';
-    brandMark.style.opacity = 1 - mapRange(p, ARRIVAL_END - 0.04, ARRIVAL_END);
-
-    var headerT = mapRange(p, ARRIVAL_END - 0.14, ARRIVAL_END + 0.01);
-    var headerEase = ease('power2.inOut', headerT);
-    siteHeader.style.background = 'rgba(247,243,236,' + (headerEase * 0.86) + ')';
-    siteHeader.style.backdropFilter = 'blur(' + (headerEase * 10) + 'px)';
-    siteHeader.style.boxShadow = '0 1px 0 rgba(27,42,65,' + (headerEase * 0.06) + ')';
-    headerWordmark.style.opacity = headerEase;
-    headerWordmark.style.transform = 'translateY(' + (6 - headerEase * 6) + 'px)';
-
-    arrivalWords.forEach(function(word, i){
-      var wt = mapRange(p, BRAND_END + 0.06 + i * 0.03, BRAND_END + 0.20 + i * 0.03);
-      var eased = ease('power4.out', wt);
-      word.style.transform = 'translateY(' + (105 - eased * 105) + '%)';
-    });
-
-    var megaIn = mapRange(p, MAT_A_END, MAT_A_END + 0.06);
-    megaDigits.forEach(function(d, i){
-      var dt = mapRange(p, MAT_A_END + i * 0.012, MAT_A_END + 0.05 + i * 0.012);
-      var eased = ease('power4.out', dt);
-      d.style.transform = 'translateY(' + (-0.5 + eased * 0.5) + 'em)';
-    });
-
-    // the number is a graphic object first, then shrinks into a small persistent
-    // annotation once the value scene takes over — it never simply vanishes
-    var megaScale = kf(p, [[MAT_A_END, 0.7], [MAT_A_END + 0.06, 1.0], [MAT_END - 0.05, 1.05], [MAT_END, 0.24], [VALUE_END, 0.24]]);
-    var megaY = kf(p, [[MAT_END - 0.05, 0], [MAT_END, -30], [VALUE_END, -30]]);
-    var megaOpacity = kf(p, [[MAT_A_END, 0], [MAT_A_END + 0.06, 1], [MAT_END - 0.05, 1], [MAT_END, 0.85], [VALUE_END, 0.85]]);
-    megaNumber.style.opacity = megaOpacity;
-    megaNumber.style.transform = 'translate(-50%,calc(-50% + ' + megaY + 'vh)) scale(' + megaScale + ')';
-    megaCaption.style.opacity = mapRange(p, MAT_A_END + 0.05, MAT_A_END + 0.11) * (1 - mapRange(p, MAT_END - 0.05, MAT_END));
-
-    // VALUE: price becomes typography, not a card — gold stays nearby, smaller
-    valuePrice.style.opacity = mapRange(p, MAT_END + 0.05, VALUE_END - 0.05);
-    valuePrice.style.transform = 'translateY(-50%) translateX(' + (24 - ease('power2.out', mapRange(p, MAT_END, VALUE_END)) * 24) + 'px)';
-
-    actProgressDot.style.transform = 'translateY(' + (p * 18) + 'vh)';
-  }
-  renderAct(0);
-
-  /* ============ MARKET: staggered reveal ============ */
-  ScrollTrigger.batch('[data-rate]', {
-    start: 'top 85%',
-    onEnter: function(batch){
-      gsap.to(batch, {opacity:1, y:0, duration:0.7, stagger:0.12, ease:'power3.out'});
-    }
-  });
-
-  /* ============ PRODUCT TRANSFORMATION: the cinematic bar shrinks into the first product ============ */
-  var transformFrame = document.getElementById('transformFrame');
-  var transformBar = document.getElementById('transformBar');
-  var transformCaption = document.getElementById('transformCaption');
+  gsap.set(s1Logo, {opacity:0, y:14, scale:.94});
+  gsap.to(s1Logo, {opacity:1, y:0, scale:1, duration:1, ease:'power3.out', delay:.15});
 
   ScrollTrigger.create({
-    trigger: '#transformStage',
-    start: 'top top',
-    end: 'bottom bottom',
-    pin: '.transform-inner',
-    scrub: 0.4,
-    onUpdate: function(self){
+    trigger:'#s1', start:'top top', end:'bottom top', scrub:.4,
+    onUpdate:function(self){
       var p = self.progress;
-      var frameW = kf(p, [[0, 34], [0.55, 34], [0.85, 15]]);
-      transformFrame.style.width = frameW + 'vw';
-      transformFrame.style.opacity = 1 - mapRange(p, 0.75, 0.94);
-      transformBar.style.opacity = mapRange(p, 0.58, 0.82);
-      transformCaption.style.opacity = mapRange(p, 0.32, 0.55) * (1 - mapRange(p, 0.86, 1));
+      s1Logo.style.opacity = 1 - mapRange(p, .3, .85);
+      s1Logo.style.transform = 'translateY(' + (-p*30) + 'px) scale(' + (1 - p*.12) + ')';
+      s1BarWrap.style.transform = 'translateY(' + (p*-14) + 'px) rotateY(' + (p*6) + 'deg)';
+
+      var headerEase = ease('power2.inOut', mapRange(p, .35, .85));
+      siteHeader.style.background = 'rgba(245,240,232,' + (headerEase*.92) + ')';
+      headerWordmark.style.opacity = headerEase;
+      headerWordmark.style.transform = 'translateY(' + (6 - headerEase*6) + 'px)';
     }
   });
 
-  gsap.fromTo('#shopTitleWord', {yPercent:105}, {
-    yPercent:0, duration:0.9, ease:'power4.out',
-    scrollTrigger:{trigger:'#shop', start:'top 82%'}
+  /* ============ SECTION 2: pinned phrase cycler ============ */
+  var s2Bar = document.getElementById('s2Bar');
+  var s2Phrases = document.querySelectorAll('.s2-phrase');
+  var PHRASE_COUNT = s2Phrases.length;
+
+  ScrollTrigger.create({
+    trigger:'#s2Stage', start:'top top', end:'bottom bottom', scrub:.4,
+    onUpdate:function(self){
+      var p = self.progress;
+      s2Bar.style.transform = 'scale(' + (1 + p*.12) + ') rotateY(' + (-8 + p*8) + 'deg)';
+
+      var seg = 1 / PHRASE_COUNT;
+      s2Phrases.forEach(function(ph, i){
+        var start = i * seg, end = start + seg;
+        var localT = mapRange(p, start, start + seg*.28);
+        var localOut = mapRange(p, end - seg*.28, end);
+        var opacity = (i === PHRASE_COUNT-1) ? localT : localT * (1-localOut);
+        var y = (1-ease('power3.out', localT)) * 14 - ease('power2.in', localOut) * 14;
+        ph.style.opacity = opacity;
+        ph.style.transform = 'translateY(' + y + 'px)';
+      });
+    }
   });
 
-  /* ============ product rows: light entrance on scroll ============ */
-  gsap.utils.toArray('.product-row').forEach(function(row){
-    gsap.fromTo(row, {opacity:0, y:24}, {
-      opacity:1, y:0, duration:0.7, ease:'power3.out',
-      scrollTrigger:{trigger:row, start:'top 88%'}
-    });
+  /* ============ SECTION 3: steps reveal ============ */
+  ScrollTrigger.batch('.s3-item', {
+    start:'top 88%',
+    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.7, stagger:.12, ease:'power3.out'}); }
+  });
+
+  /* ============ SECTION 4: pinned interactive showcase ============ */
+  var s4Stack = document.getElementById('s4Stack');
+  var s4Flip = document.getElementById('s4Flip');
+  var s4Headline = document.getElementById('s4Headline');
+  var s4Sub = document.getElementById('s4Sub');
+  var s4Caption = document.getElementById('s4Caption');
+  var s4Tag1 = document.getElementById('s4Tag1');
+  var s4Tag2 = document.getElementById('s4Tag2');
+
+  var S4_CAPTIONS = [
+    {end:.28, text:'الزاوية الأمامية'},
+    {end:.52, text:'النقش والنقاء'},
+    {end:.68, text:'سماكة السبيكة'},
+    {end:.86, text:'الوجه الخلفي'},
+    {end:1.0, text:'حضور دائم'}
+  ];
+
+  ScrollTrigger.create({
+    trigger:'#s4Stage', start:'top top', end:'bottom bottom', scrub:.5,
+    onUpdate:function(self){
+      var p = self.progress;
+
+      var rotateY = kf(p, [[0,-18],[.28,0],[.55,0],[.68,22],[.86,180],[1,180]]);
+      var scale = kf(p, [[0,.92],[.28,1],[.40,1.32],[.55,1.32],[.68,1.18],[.86,1.28],[1,1]]);
+      s4Flip.style.transform = 'rotateY(' + rotateY + 'deg) scale(' + scale + ')';
+
+      s4Headline.style.opacity = mapRange(p,.0,.08) * (1-mapRange(p,.2,.3));
+      s4Sub.style.opacity = mapRange(p,.86,.96);
+      s4Caption.style.opacity = mapRange(p,.05,.12);
+
+      var cur = S4_CAPTIONS[0].text;
+      for (var i=0;i<S4_CAPTIONS.length;i++){ if (p <= S4_CAPTIONS[i].end){ cur = S4_CAPTIONS[i].text; break; } }
+      if (s4Caption.textContent !== cur) s4Caption.textContent = cur;
+
+      s4Tag1.style.opacity = mapRange(p,.30,.38) * (1-mapRange(p,.60,.68));
+      s4Tag2.style.opacity = mapRange(p,.42,.50) * (1-mapRange(p,.60,.68));
+    }
+  });
+
+  /* ============ SECTION 5: pricing reveal ============ */
+  ScrollTrigger.batch('[data-reveal]', {
+    start:'top 88%',
+    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.8, stagger:.15, ease:'power3.out'}); }
+  });
+
+  /* ============ SECTION 6: interlude reveal ============ */
+  gsap.to(['.s6-headline','.s6-sub'], {
+    opacity:1, y:0, duration:.9, stagger:.15, ease:'power3.out',
+    scrollTrigger:{trigger:'#s6', start:'top 70%'}
+  });
+
+  /* ============ SECTION 7: value lines stagger ============ */
+  ScrollTrigger.batch('.s7-value', {
+    start:'top 88%',
+    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.7, stagger:.15, ease:'power3.out'}); }
+  });
+
+  /* ============ SECTION 8: product rows reveal ============ */
+  ScrollTrigger.batch('.s8-item', {
+    start:'top 90%',
+    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.7, stagger:.1, ease:'power3.out'}); }
+  });
+
+  /* ============ SECTION 9: final CTA reveal ============ */
+  gsap.to(['.s9-headline','.s9-sub','.s9-cta-btn'], {
+    opacity:1, y:0, duration:.9, stagger:.15, ease:'power3.out',
+    scrollTrigger:{trigger:'#s9', start:'top 75%'}
   });
 
 })();

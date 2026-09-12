@@ -4,30 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>الزومان | سبائك ذهب ٩٩٩.٩</title>
-<meta name="description" content="الزومان — سبائك ذهب عيار ٩٩٩.٩ من بريدة، السعودية. رقم تسلسلي فريد وشهادة أصالة لكل سبيكة.">
+<meta name="description" content="الزومان — سبائك ذهب استثمارية عيار ٩٩٩.٩ من السعودية. أوزان متعددة، أسعار واضحة، وتجربة شراء موثوقة.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=El+Messiri:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- live market line -->
+<div class="ticker-line" id="tickerLine">
+  <span>Au/oz</span>
+  <span class="num" id="tickerOunce">—</span>
+  <span class="ticker-arrow" id="tickerArrow">—</span>
+</div>
+
 <!-- ============ HEADER ============ -->
 <header class="site-header" id="siteHeader">
-  <button type="button" class="header-btn" id="menuBtn" aria-label="القائمة" aria-expanded="false">
-    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
-      <line x1="0" y1="1" x2="22" y2="1" stroke="currentColor" stroke-width="1.4"/>
-      <line x1="0" y1="7" x2="22" y2="7" stroke="currentColor" stroke-width="1.4"/>
-      <line x1="0" y1="13" x2="22" y2="13" stroke="currentColor" stroke-width="1.4"/>
-    </svg>
-  </button>
-  <span class="header-wordmark" id="headerWordmark">ALZUMAN</span>
-  <button type="button" class="header-btn" id="bagBtn" aria-label="السلة">
-    <svg width="19" height="20" viewBox="0 0 19 20" fill="none">
-      <path d="M5 6V4.5a4.5 4.5 0 0 1 9 0V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-      <rect x="1.2" y="6" width="16.6" height="12.6" rx="1.4" stroke="currentColor" stroke-width="1.3"/>
-    </svg>
-  </button>
+  <div class="header-group">
+    <button type="button" class="header-btn" id="menuBtn" aria-label="القائمة" aria-expanded="false">
+      <svg width="20" height="13" viewBox="0 0 20 13" fill="none">
+        <line x1="0" y1="1" x2="20" y2="1" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="0" y1="6.5" x2="20" y2="6.5" stroke="currentColor" stroke-width="1.3"/>
+        <line x1="0" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+    </button>
+  </div>
+  <span class="header-wordmark" id="headerWordmark"><img src="/assets/alzuman-logo.png" alt="الزومان"></span>
+  <div class="header-group">
+    <button type="button" class="header-btn" aria-label="الحساب">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M2 14c0-3 2.7-5 6-5s6 2 6 5" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+    </button>
+    <button type="button" class="header-btn" id="bagBtn" aria-label="السلة">
+      <svg width="17" height="18" viewBox="0 0 17 18" fill="none">
+        <path d="M4.5 5.5V4a3.5 3.5 0 0 1 7 0v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <rect x="1" y="5.5" width="14.5" height="11" rx="1.2" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+    </button>
+  </div>
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
@@ -37,120 +54,207 @@
       <line x1="17" y1="1" x2="1" y2="17" stroke="currentColor" stroke-width="1.4"/>
     </svg>
   </button>
-  <a href="#market">أسعار الذهب</a>
-  <a href="#shop">السبائك</a>
+  <a href="#s5">أسعار الذهب</a>
+  <a href="#s8">السبائك</a>
+  <a href="#s7">من نحن</a>
   <a href="tel:0562658444">تواصل معنا</a>
 </div>
 
-<!-- ============ ACT I — CINEMATIC PIN (Brand / Arrival / Material / Value) ============ -->
-<div class="pin-stage" id="pinStage">
-  <div class="pin-inner">
-
-    <div class="hero-video-bg" aria-hidden="true">
-      <video id="heroVideo" autoplay muted playsinline loop preload="auto" src="/assets/hero.mp4"></video>
-    </div>
-
-    <div class="brand-mark" id="brandMark">
-      <img src="/assets/alzuman-logo.png" alt="الزومان" class="brand-emblem" id="brandLogo">
-    </div>
-
-    <div class="scroll-invite" id="scrollInvite" aria-hidden="true">
-      <span class="scroll-invite-text">مرّر لاكتشاف الذهب</span>
-      <span class="scroll-invite-rail"><i></i></span>
-    </div>
-
-    <p class="arrival-phrase" id="arrivalPhrase" aria-label="للقيمة وزن">
-      <span class="aw"><i>للقيمة</i></span><span class="aw"><i>وزن</i></span>
-    </p>
-
-    <p class="mega-number" id="megaNumber" aria-label="999.9">
-      <span class="mn-d">9</span><span class="mn-d">9</span><span class="mn-d">9</span><small>٫٩</small>
-    </p>
-    <p class="mega-caption" id="megaCaption">ذهب نقي</p>
-
-    <div class="value-price" id="valuePrice">
-      <span class="value-price-eyebrow">القيمة الآن</span>
-      <span class="value-price-amount" id="valueAmount" dir="ltr">—</span>
-      <span class="value-price-unit">ريال سعودي / غرام</span>
-    </div>
-
-    <div class="act-progress" aria-hidden="true"><i id="actProgressDot"></i></div>
-  </div>
-</div>
-
-<!-- ============ MARKET ============ -->
-<section class="market-section" id="market">
-  <span class="market-eyebrow">السوق الآن</span>
-  <h2 class="market-title">نقاءٌ لا يحتاج إلى مبالغة</h2>
-  <p class="market-brand-line">الزومان — سبائك ذهب فقط، بعيار ٩٩٩.٩</p>
-
-  <div class="ounce-counter" data-rate>
-    <span class="ounce-counter-label">سعر الأونصة عالمياً</span>
-    <span class="ounce-counter-amount num" id="rateOunceUsd" dir="ltr">—</span>
-    <span class="ounce-counter-arrow" id="ounceArrow">—</span>
-  </div>
-
-  <div class="rate-grid">
-    <div class="rate-tile" data-rate>
-      <span class="rate-tile-karat">عيار ٢٤</span>
-      <span class="rate-tile-value num" id="rate24k" dir="ltr">—</span>
-      <span class="rate-tile-unit">ر.س / غرام</span>
-    </div>
-    <div class="rate-tile" data-rate>
-      <span class="rate-tile-karat">عيار ٢٢</span>
-      <span class="rate-tile-value num" id="rate22k" dir="ltr">—</span>
-      <span class="rate-tile-unit">ر.س / غرام</span>
-    </div>
-    <div class="rate-tile" data-rate>
-      <span class="rate-tile-karat">عيار ٢١</span>
-      <span class="rate-tile-value num" id="rate21k" dir="ltr">—</span>
-      <span class="rate-tile-unit">ر.س / غرام</span>
-    </div>
-    <div class="rate-tile" data-rate>
-      <span class="rate-tile-karat">عيار ١٨</span>
-      <span class="rate-tile-value num" id="rate18k" dir="ltr">—</span>
-      <span class="rate-tile-unit">ر.س / غرام</span>
+<!-- ============ SECTION 1 — COLD OPEN HERO ============ -->
+<section class="s1-hero" id="s1">
+  <div class="s1-bgsymbol" aria-hidden="true"></div>
+  <img class="s1-logo" id="s1Logo" src="/assets/alzuman-logo.png" alt="الزومان">
+  <div class="s1-bar-wrap" id="s1BarWrap">
+    <div class="bullion-bar">
+      <div class="bullion-bar-face">
+        <span class="bullion-bar-purity">999.9</span>
+        <span class="bullion-bar-unit">FINE GOLD</span>
+        <span class="bullion-bar-hallmark">ALZUMAN — SAUDI ARABIA</span>
+      </div>
     </div>
   </div>
-
-  <p class="market-note">الأسعار للغرام الواحد، محسوبة من سعر الأونصة العالمي الحالي.</p>
+  <h1 class="s1-headline">الزومان</h1>
+  <p class="s1-sub">سبائك ذهب بقيمة حقيقية.</p>
+  <span class="s1-micro micro">ALZUMAN JEWELRY</span>
+  <a href="#s2" class="s1-cta">ابدأ التصفح ←</a>
 </section>
 
-<!-- ============ PRODUCT TRANSFORMATION ============ -->
-<div class="transform-stage" id="transformStage">
-  <div class="transform-inner">
-    <div class="transform-frame" id="transformFrame">
-      <video id="videoC" autoplay muted playsinline loop preload="auto" src="/assets/scene2-sand-2.mp4"></video>
+<!-- ============ SECTION 2 — STATEMENT HERO ============ -->
+<div class="s2-stage" id="s2Stage">
+  <div class="s2-inner" id="s2">
+    <div class="bullion-bar" id="s2Bar">
+      <div class="bullion-bar-face">
+        <span class="bullion-bar-purity">999.9</span>
+        <span class="bullion-bar-unit">FINE GOLD</span>
+      </div>
     </div>
-    <div class="transform-bar" id="transformBar" style="opacity:0;"></div>
-    <p class="transform-caption" id="transformCaption">من سبيكةٍ واحدة، إلى مجموعة كاملة</p>
+    <span class="micro" style="margin-bottom:1rem;">INVESTMENT-GRADE GOLD</span>
+    <h2 class="s2-headline">ذهب بقيمة حقيقية.</h2>
+    <p class="s2-sub">سبائك مختارة بأوزان متعددة، بتسعير واضح، وتجربة شراء موثوقة من الطلب حتى الاستلام.</p>
+    <div class="s2-cycler" id="s2Cycler">
+      <p class="s2-phrase" data-i="0">ذهب بقيمة حقيقية.</p>
+      <p class="s2-phrase" data-i="1">أوزان متعددة.</p>
+      <p class="s2-phrase" data-i="2">أسعار واضحة.</p>
+      <p class="s2-phrase" data-i="3">شراء موثوق.</p>
+      <p class="s2-phrase" data-i="4">من الطلب حتى الاستلام.</p>
+    </div>
   </div>
 </div>
 
-<!-- ============ SHOP ============ -->
-<section class="shop-section" id="shop">
-  <h2 class="shop-title"><span class="mask-line"><i id="shopTitleWord">السبائك</i></span></h2>
-  <p class="shop-sub">خمس سبائك، بعيار ٩٩٩.٩، لكل وزنٍ حضوره.</p>
+<!-- ============ SECTION 3 — HOW IT WORKS ============ -->
+<section class="s3-steps" id="s3">
+  <div class="s3-head">
+    <span class="micro" style="display:block;margin-bottom:1rem;">HOW IT WORKS</span>
+    <h2 class="s3-headline">طريقة واضحة. تجربة مطمئنة.</h2>
+    <p class="s3-sub">من اختيار السبيكة إلى تأكيد الطلب والتسليم، كل خطوة واضحة ومباشرة.</p>
+  </div>
+  <div class="s3-list">
+    <div class="s3-item"><span class="s3-item-num num">01</span><span class="s3-item-text">اختر السبيكة</span></div>
+    <div class="s3-item"><span class="s3-item-num num">02</span><span class="s3-item-text">أكمل بياناتك</span></div>
+    <div class="s3-item"><span class="s3-item-num num">03</span><span class="s3-item-text">أرفق إيصال التحويل</span></div>
+    <div class="s3-item"><span class="s3-item-num num">04</span><span class="s3-item-text">نراجع ونؤكد الطلب</span></div>
+    <div class="s3-item"><span class="s3-item-num num">05</span><span class="s3-item-text">تُجهّز للشحن والتسليم</span></div>
+  </div>
+  <p style="text-align:center; margin-top:6vh;"><a href="tel:0562658444" class="s1-cta">ابدأ الطلب ←</a></p>
+</section>
 
-  <div id="productList"></div>
+<!-- ============ SECTION 4 — INTERACTIVE BULLION SHOWCASE ============ -->
+<div class="s4-stage" id="s4Stage">
+  <div class="s4-inner" id="s4">
+    <span class="micro s4-eyebrow">THE BULLION</span>
+    <h2 class="s4-headline" id="s4Headline">تفاصيل تُرى بوضوح.</h2>
+    <div class="s4-stack" id="s4Stack">
+      <div class="s4-flip" id="s4Flip">
+        <div class="s4-face front bullion-bar">
+          <div class="bullion-bar-face">
+            <span class="bullion-bar-purity">999.9</span>
+            <span class="bullion-bar-unit">FINE GOLD — 1 OUNCE</span>
+            <span class="bullion-bar-hallmark">ALZUMAN — SAUDI ARABIA</span>
+          </div>
+        </div>
+        <div class="s4-face back bullion-bar">
+          <div class="bullion-bar-face">
+            <span class="bullion-bar-purity" style="font-size:.85rem;">ALZUMAN</span>
+            <span class="bullion-bar-unit">SERIAL №004471</span>
+          </div>
+        </div>
+      </div>
+      <span class="s4-detail-tag" id="s4Tag1" style="top:-6%; right:-4%;">999.9</span>
+      <span class="s4-detail-tag" id="s4Tag2" style="bottom:-8%; left:-2%;">1 OUNCE</span>
+    </div>
+    <span class="s4-caption" id="s4Caption">النقش والحواف</span>
+    <p class="s4-sub" id="s4Sub">النقش، النقاء، الحضور المادي — كل تفصيلة تؤكد القيمة.</p>
+  </div>
+</div>
 
-  <div class="trust-strip">
-    <span><b>٩٩٩.٩</b> عيار موثّق</span>
-    <span><b>#</b> رقم تسلسلي فريد</span>
-    <span><b>✓</b> شهادة أصالة</span>
+<!-- ============ SECTION 5 — LIVE GOLD PRICING ============ -->
+<section class="s5-pricing" id="s5">
+  <div class="s5-head">
+    <span class="micro" style="display:block;margin-bottom:1rem;">LIVE GOLD INDEX</span>
+    <h2 class="s5-headline">السعر يتحرك. الوضوح لا.</h2>
+    <p class="s5-sub">نعرض أسعار الذهب بصورة هادئة وواضحة، لتبقى القيمة مفهومة قبل القرار.</p>
   </div>
 
-  <p class="escrow-line">المبلغ يبقى أمانة حتى تُسلَّم السبيكة لشركة الشحن</p>
+  <div class="price-ounce" data-reveal>
+    <span class="micro">سعر الأونصة العالمي</span>
+    <span class="price-ounce-amount num" id="rateOunceUsd">—</span>
+    <span class="price-ounce-arrow" id="ounceArrow">—</span>
+  </div>
+
+  <div class="price-module" data-reveal>
+    <div class="price-cell">
+      <span class="price-cell-karat micro">24K</span>
+      <span class="price-cell-value num" id="rate24k">—</span>
+      <span class="price-cell-unit">ر.س / غرام</span>
+    </div>
+    <div class="price-cell">
+      <span class="price-cell-karat micro">22K</span>
+      <span class="price-cell-value num" id="rate22k">—</span>
+      <span class="price-cell-unit">ر.س / غرام</span>
+    </div>
+    <div class="price-cell">
+      <span class="price-cell-karat micro">21K</span>
+      <span class="price-cell-value num" id="rate21k">—</span>
+      <span class="price-cell-unit">ر.س / غرام</span>
+    </div>
+    <div class="price-cell">
+      <span class="price-cell-karat micro">18K</span>
+      <span class="price-cell-value num" id="rate18k">—</span>
+      <span class="price-cell-unit">ر.س / غرام</span>
+    </div>
+  </div>
+  <p class="s5-note">الأسعار للغرام الواحد، محسوبة من سعر الأونصة العالمي الحالي.</p>
+  <p style="text-align:center; margin-top:3vh;"><a href="#s8" class="s1-cta">تصفح السبائك ←</a></p>
+</section>
+
+<!-- ============ SECTION 6 — EMOTIONAL INTERLUDE ============ -->
+<section class="s6-interlude" id="s6">
+  <span class="micro" style="display:block;margin-bottom:1.4rem;">ALZUMAN PHILOSOPHY</span>
+  <h2 class="s6-headline">الذهب الذي يبقى.</h2>
+  <p class="s6-sub">قيمة يمكن امتلاكها، والاحتفاظ بها.</p>
+</section>
+
+<!-- ============ SECTION 7 — ABOUT / BRAND VALUE ============ -->
+<section class="s7-about" id="s7">
+  <div class="s7-bgsymbol" aria-hidden="true"></div>
+  <span class="micro" style="position:relative;z-index:1;display:block;margin-bottom:1.2rem;">ABOUT ALZUMAN</span>
+  <h2 class="s7-headline">الزومان — للذهب كقيمة، لا كزينة.</h2>
+  <p class="s7-sub">نقدم سبائك ذهبية مختارة لمن يبحث عن وضوح السعر، موثوقية الشراء، وقيمة تبقى.</p>
+  <div class="s7-values">
+    <span class="s7-value">واضح في مصدره.</span>
+    <span class="s7-value">دقيق في قيمته.</span>
+    <span class="s7-value">مصمم للاقتناء.</span>
+  </div>
+  <p style="position:relative;z-index:1;text-align:center; margin-top:6vh;"><a href="#s8" class="s1-cta">اكتشف المجموعة ←</a></p>
+</section>
+
+<!-- ============ SECTION 8 — PRODUCT GRID ============ -->
+<section class="s8-grid-section" id="s8">
+  <div class="s8-head">
+    <span class="micro" style="display:block;margin-bottom:1rem;">THE COLLECTION</span>
+    <h2 class="s8-headline">مجموعة السبائك</h2>
+    <p class="s8-sub">أوزان متعددة، مع سعر محدث وتجربة اختيار واضحة.</p>
+  </div>
+  <div class="s8-items" id="s8Items"></div>
+</section>
+
+<!-- ============ SECTION 9 — FINAL CTA ============ -->
+<section class="s9-cta" id="s9">
+  <h2 class="s9-headline">امتلك القيمة.</h2>
+  <p class="s9-sub">اختر السبيكة المناسبة لك، ضمن تجربة تحفظ الوضوح والثقة في كل خطوة.</p>
+  <a href="#s8" class="s9-cta-btn">تسوّق الآن</a>
 </section>
 
 <footer class="site-footer">
-  <img src="/assets/alzuman-logo-light.png" alt="الزومان" class="footer-logo">
-  <div class="footer-contact">
-    <a href="tel:0562658444" dir="ltr">056 265 8444</a>
-    <a href="https://www.snapchat.com/add/zo-gold1" target="_blank" rel="noopener">سناب: zo-gold1</a>
+  <img src="/assets/alzuman-logo.png" alt="الزومان" class="footer-logo">
+  <div class="footer-cols">
+    <div class="footer-col">
+      <span class="footer-col-title">الزومان</span>
+      <a href="#s7">من نحن</a>
+      <a href="#s5">أسعار الذهب</a>
+    </div>
+    <div class="footer-col">
+      <span class="footer-col-title">المتجر</span>
+      <a href="#s8">السبائك</a>
+      <a href="#s3">طريقة الشراء</a>
+    </div>
+    <div class="footer-col">
+      <span class="footer-col-title">الطلبات</span>
+      <a href="tel:0562658444">تتبع الطلب</a>
+      <a href="tel:0562658444">الشحن والتسليم</a>
+    </div>
+    <div class="footer-col">
+      <span class="footer-col-title">السياسات</span>
+      <p>الأمانة والاسترجاع</p>
+      <p>الخصوصية</p>
+    </div>
+    <div class="footer-col">
+      <span class="footer-col-title">التواصل</span>
+      <a href="tel:0562658444" dir="ltr">056 265 8444</a>
+      <a href="https://www.snapchat.com/add/zo-gold1" target="_blank" rel="noopener">سناب: zo-gold1</a>
+    </div>
   </div>
-  <p class="footer-location">بريدة، السعودية</p>
-  <p class="copyright">© الزومان — جميع الحقوق محفوظة</p>
+  <p class="footer-bottom">© الزومان — بريدة، السعودية — جميع الحقوق محفوظة</p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
