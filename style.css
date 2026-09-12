@@ -339,43 +339,108 @@ button{font-family:inherit;}
 .market-title{
   text-align:center;
   font-size:clamp(1.7rem,6vw,2.6rem);
-  margin-bottom:6vh;
+  margin-bottom:1.6rem;
 }
-.rate-list{
-  max-width:520px;
-  margin:0 auto;
-  border-top:1px solid var(--champagne-line);
+.market-brand-line{
+  text-align:center;
+  font-family:'El Messiri',serif;
+  font-weight:600;
+  font-size:.92rem;
+  letter-spacing:.02em;
+  color:var(--champagne-deep);
+  margin:0 auto 6vh;
 }
-.rate-row{
+
+/* ounce price: the headline "counter" — the single global reference number */
+.ounce-counter{
   display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  padding:1.35rem 0;
+  flex-direction:column;
+  align-items:center;
+  gap:.35rem;
+  max-width:520px;
+  margin:0 auto 5vh;
+  padding-bottom:4vh;
   border-bottom:1px solid var(--champagne-line);
   opacity:0;
   transform:translateY(18px);
 }
-.rate-row .rate-label{
-  font-size:1rem;
-  color:var(--navy);
+.ounce-counter-label{
+  font-size:.78rem;
+  letter-spacing:.18em;
+  color:var(--navy-soft);
   font-weight:600;
 }
-.rate-row .rate-value{
+.ounce-counter-amount{
   font-family:'Cormorant Garamond', serif;
   font-weight:600;
-  font-size:1.6rem;
+  font-size:clamp(2.6rem,11vw,3.6rem);
+  color:var(--navy);
   direction:ltr;
+  line-height:1;
 }
-.rate-row.ounce{
-  margin-top:1.2rem;
-  border-top:1px dashed var(--champagne-line);
-  padding-top:1.6rem;
+.ounce-counter-arrow{
+  font-size:.85rem;
+  color:var(--navy-soft);
 }
-.rate-row.ounce .rate-label{color:var(--navy-soft); font-weight:500; font-size:.88rem;}
-.rate-row.ounce .rate-value{font-size:1.25rem; color:var(--navy-soft);}
-.rate-arrow{font-size:.7rem; margin-inline-start:.4rem;}
-.rate-arrow.up{color:var(--up);}
-.rate-arrow.down{color:var(--down);}
+.ounce-counter-arrow.up{color:var(--up);}
+.ounce-counter-arrow.down{color:var(--down);}
+
+/* karat rates: four engraved gold-bar tiles */
+.rate-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:3.4vw;
+  max-width:480px;
+  margin:0 auto;
+}
+.rate-tile{
+  position:relative;
+  aspect-ratio:1.55/1;
+  border-radius:4px;
+  padding:.95rem 1.05rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  background:linear-gradient(135deg,#F3E2A8 0%,#D8B159 42%,#A97C34 78%,#8B6914 100%);
+  box-shadow:0 16px 30px -16px rgba(27,42,65,.35);
+  overflow:hidden;
+  opacity:0;
+  transform:translateY(18px);
+}
+.rate-tile::after{
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(75deg,transparent 40%, rgba(255,255,255,.4) 50%, transparent 60%);
+  background-size:220% 100%;
+  background-position:-100% 0;
+  animation:shineMove 5.5s ease-in-out infinite;
+}
+.rate-tile-karat{
+  position:relative;
+  z-index:1;
+  font-family:'El Messiri', serif;
+  font-weight:700;
+  font-size:.82rem;
+  letter-spacing:.03em;
+  color:rgba(27,42,65,.68);
+}
+.rate-tile-value{
+  position:relative;
+  z-index:1;
+  font-family:'Cormorant Garamond', serif;
+  font-weight:700;
+  font-size:clamp(1.15rem,5vw,1.5rem);
+  color:var(--navy);
+  direction:ltr;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+.rate-tile-unit{
+  position:relative;
+  z-index:1;
+  font-size:.64rem;
+  letter-spacing:.05em;
+  color:rgba(27,42,65,.58);
+}
 .market-note{
   max-width:520px;
   margin:2rem auto 0;
