@@ -14,9 +14,9 @@
     {label:'5 غرامات', grams:5, dims:'14 × 23 × 0.7 مم'},
     {label:'10 غرامات', grams:10, dims:'17 × 28 × 0.9 مم'},
     {label:'20 غراماً', grams:20, dims:'21 × 33 × 1.2 مم'},
-    {label:'50 غراماً', grams:50, dims:'28 × 45 × 1.6 مم'},
-    {label:'100 غرام', grams:100, dims:'34 × 55 × 2.1 مم'},
-    {label:'1 أونصة', grams:OUNCE_GRAMS, dims:'24 × 41 × 1.9 مم'}
+    {label:'50 غراماً', grams:50, dims:'28 × 45 × 1.6 مم', feature:true},
+    {label:'100 غرام', grams:100, dims:'34 × 55 × 2.1 مم', feature:true},
+    {label:'1 أونصة', grams:OUNCE_GRAMS, dims:'24 × 41 × 1.9 مم', feature:true}
   ];
   var ouncePrice = 4183.40;
 
@@ -51,19 +51,20 @@
     renderPrices(ouncePrice > prev ? 'up' : (ouncePrice < prev ? 'down' : null));
   }
 
-  /* ============ scene 10: product collection (placeholder visuals — no video-derived bars) ============ */
+  /* ============ product collection — editorial gallery, real bullion photography ============ */
   var productList = document.getElementById('productList');
   WEIGHTS.forEach(function(w){
     var row = document.createElement('div');
-    row.className = 'product-row';
+    row.className = 'product-row' + (w.feature ? ' feature' : '');
+    row.setAttribute('data-reveal','');
     row.innerHTML =
-      '<div class="product-visual">الصورة قيد الإضافة</div>' +
+      '<div class="product-visual"><img src="/assets/alzuman-bar-front.jpg" alt="سبيكة الزومان — '+w.label+'"></div>' +
       '<div class="product-info">' +
         '<span class="product-weight">'+w.label+'</span>' +
         '<span class="product-purity">عيار ٩٩٩.٩ · '+w.dims+'</span>' +
         '<span class="product-price num"></span>' +
         '<span class="product-stock">متوفر</span>' +
-        '<a href="tel:0562658444" class="product-cta">عرض السبيكة ←</a>' +
+        '<a href="tel:0562658444" class="product-cta">عرض السبيكة</a>' +
       '</div>';
     productList.appendChild(row);
     productPriceEls.push({el:row.querySelector('.product-price'), grams:w.grams});
@@ -82,34 +83,70 @@
   menuCloseBtn.addEventListener('click', closeMenu);
   mobileMenu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', closeMenu); });
 
-  /* ============ video play/pause via IntersectionObserver (performance) ============ */
-  var videos = Array.prototype.slice.call(document.querySelectorAll('video'));
-  if ('IntersectionObserver' in window){
-    var videoObserver = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        var v = entry.target;
-        if (entry.isIntersecting){ v.play().catch(function(){}); }
-        else { v.pause(); }
-      });
-    }, {rootMargin:'60% 0px 60% 0px', threshold:0.01});
-    videos.forEach(function(v){ videoObserver.observe(v); });
-  } else {
-    videos.forEach(function(v){ v.play().catch(function(){}); });
+  /* ============ single hero video: play/pause via IntersectionObserver ============ */
+  var heroVideo = document.getElementById('v1');
+  if (heroVideo){
+    if ('IntersectionObserver' in window){
+      var videoObserver = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if (entry.isIntersecting){ heroVideo.play().catch(function(){}); }
+          else { heroVideo.pause(); }
+        });
+      }, {rootMargin:'40% 0px 40% 0px', threshold:0.01});
+      videoObserver.observe(heroVideo);
+    } else {
+      heroVideo.play().catch(function(){});
+    }
   }
 
-  /* ============ reduced motion: nothing more to wire up ============ */
-  if (reduceMotion || !window.gsap || !window.ScrollTrigger){
-    return;
+  /* ============ generic reveal-on-scroll for [data-reveal], works without GSAP too ============ */
+  var revealTargets = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'));
+  if (!reduceMotion && 'IntersectionObserver' in window){
+    var revealObserver = new IntersectionObserver(function(entries, obs){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.style.transition = 'opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1)';
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = 'none';
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15, rootMargin:'0px 0px -8% 0px'});
+    revealTargets.forEach(function(el, i){
+      el.style.transitionDelay = (i % 4) * 60 + 'ms';
+      revealObserver.observe(el);
+    });
+  } else {
+    revealTargets.forEach(function(el){ el.style.opacity = 1; el.style.transform = 'none'; });
   }
+
+  /* ============ Section 2 headline mask-reveal lines ============ */
+  var s2Lines = Array.prototype.slice.call(document.querySelectorAll('.s2-headline .line'));
+  if (!reduceMotion && 'IntersectionObserver' in window && s2Lines.length){
+    var lineObserver = new IntersectionObserver(function(entries, obs){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          var idx = s2Lines.indexOf(entry.target);
+          setTimeout(function(){ entry.target.classList.add('in'); }, idx * 140);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.4});
+    s2Lines.forEach(function(el){ lineObserver.observe(el); });
+  } else {
+    s2Lines.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  if (reduceMotion || !window.gsap || !window.ScrollTrigger){ return; }
 
   gsap.registerPlugin(ScrollTrigger);
-  function ease(name, t){ return gsap.parseEase(name)(clamp(t,0,1)); }
   function setOpacity(el, v){ if (el) el.style.opacity = v; }
 
-  /* ============ SCENE 1: cold open ============ */
+  /* ============ SECTION 1: cinematic opening hero — settle in, then release to the page ============ */
   var s1Logo = document.getElementById('s1Logo');
   var s1Sub = document.getElementById('s1Sub');
   var s1SubMicro = document.getElementById('s1SubMicro');
+  var s1ScrollCue = document.getElementById('s1ScrollCue');
   var s1VideoWrap = document.getElementById('s1VideoWrap');
   var headerMark = document.getElementById('headerMark');
 
@@ -117,132 +154,28 @@
     trigger:'#s1Stage', start:'top top', end:'bottom bottom', scrub:.4,
     onUpdate:function(self){
       var p = self.progress;
-      setOpacity(s1Logo, mapRange(p,.02,.1) * (1-mapRange(p,.55,.75)));
-      s1Logo.style.transform = 'translate(-50%,0) translateY(' + (-p*10) + 'vh) scale(' + (1-p*.3) + ')';
-      setOpacity(s1SubMicro, mapRange(p,.1,.18) * (1-mapRange(p,.55,.75)));
-      setOpacity(s1Sub, mapRange(p,.14,.22) * (1-mapRange(p,.55,.75)));
-      var headerEase = ease('power2.inOut', mapRange(p,.6,.9));
-      siteHeader.style.background = 'rgba(245,240,232,' + (headerEase*.9) + ')';
+      var settleOut = 1 - mapRange(p,.55,.78);
+      setOpacity(s1Logo, mapRange(p,.02,.12) * settleOut);
+      s1Logo.style.transform = 'translate(-50%,0) translateY(' + (-p*8) + 'vh)';
+      setOpacity(s1SubMicro, mapRange(p,.1,.2) * settleOut);
+      setOpacity(s1Sub, mapRange(p,.15,.25) * settleOut);
+      setOpacity(s1ScrollCue, mapRange(p,.05,.14) * (1-mapRange(p,.16,.3)));
+      var headerEase = mapRange(p,.55,.85);
+      siteHeader.style.background = 'rgba(244,239,231,' + (headerEase*.92) + ')';
       headerMark.style.opacity = headerEase;
       headerMark.style.transform = 'translateY(' + (6-headerEase*6) + 'px)';
-      s1VideoWrap.style.transform = 'scale(' + (1 - mapRange(p,.5,1)*.08) + ')';
-      s1VideoWrap.style.opacity = 1 - mapRange(p,.82,1);
+      s1VideoWrap.style.transform = 'scale(' + (1 - mapRange(p,.5,1)*.1) + ')';
+      s1VideoWrap.style.opacity = 1 - mapRange(p,.8,1);
     }
   });
 
-  /* ============ SCENE 2: statement cycler + bullion crossing the type layer ============ */
-  var s2Phrases = document.querySelectorAll('.s2-phrase');
-  var s2Final = document.getElementById('s2Final');
-  var s2Micro = document.getElementById('s2Micro');
-  var s2VideoWrap = document.getElementById('s2VideoWrap');
-  ScrollTrigger.create({
-    trigger:'#s2Stage', start:'top top', end:'bottom bottom', scrub:.4,
-    onUpdate:function(self){
-      var p = self.progress;
-      var n = s2Phrases.length;
-      var seg = 1/n;
-      s2Phrases.forEach(function(ph, i){
-        var start = i*seg, end = start+seg;
-        var inT = ease('power3.out', mapRange(p, start, start+seg*.3));
-        var outT = ease('power2.in', mapRange(p, end-seg*.25, end));
-        var opacity = inT * (1-outT);
-        ph.style.opacity = opacity;
-        ph.style.clipPath = 'inset(0 0 ' + (100-inT*100) + '% 0)';
-        ph.style.transform = 'translateY(' + ((1-inT)*18 - outT*12) + 'px)';
-      });
-      setOpacity(s2Micro, mapRange(p,.03,.1) * (1-mapRange(p,.88,.97)));
-      setOpacity(s2Final, mapRange(p,.85,.95));
-      var videoIn = mapRange(p,.08,.22);
-      s2VideoWrap.style.opacity = videoIn * (1-mapRange(p,.9,1));
-      s2VideoWrap.style.transform = 'translateY(' + ((1-videoIn)*8) + 'vh)';
-    }
-  });
-
-  /* ============ SCENE 3: bullion arrives ============ */
-  var s3Micro = document.getElementById('s3Micro');
-  var s3Headline = document.getElementById('s3Headline');
-  ScrollTrigger.create({
-    trigger:'#s3Stage', start:'top top', end:'bottom bottom', scrub:.4,
-    onUpdate:function(self){
-      var p = self.progress;
-      setOpacity(s3Micro, mapRange(p,.08,.18)*(1-mapRange(p,.75,.92)));
-      setOpacity(s3Headline, mapRange(p,.15,.28)*(1-mapRange(p,.75,.92)));
-    }
-  });
-
-  /* ============ SCENE 4: purity macro — annotations synced to video time ============ */
-  var v4 = document.getElementById('v4');
-  var s4Annot1 = document.getElementById('s4Annot1');
-  var s4Annot2 = document.getElementById('s4Annot2');
-  var s4Stage = document.getElementById('s4Stage');
-  var s4InRange = false;
-  ScrollTrigger.create({
-    trigger:'#s4Stage', start:'top top', end:'bottom bottom',
-    onUpdate:function(self){ s4InRange = self.progress > 0.05 && self.progress < 0.95; }
-  });
-  v4.addEventListener('timeupdate', function(){
-    if (!s4InRange || !v4.duration) { setOpacity(s4Annot1,0); setOpacity(s4Annot2,0); return; }
-    var t = v4.currentTime / v4.duration;
-    setOpacity(s4Annot1, mapRange(t,.28,.38) * (1-mapRange(t,.55,.62)));
-    setOpacity(s4Annot2, mapRange(t,.65,.75) * (1-mapRange(t,.95,1)));
-  });
-
-  /* ============ SCENE 5: inspection — labels synced to video time, alt clip crossfades in near end ============ */
-  var v5 = document.getElementById('v5');
-  var s5Label = document.getElementById('s5Label');
-  var s5AltWrap = document.getElementById('s5AltWrap');
-  var s5InRange = false;
-  var S5_LABELS = [
-    {end:.25, micro:'FRONT', txt:'النقاء والوزن'},
-    {end:.55, micro:'EDGE', txt:'حضور مادي'},
-    {end:.8, micro:'REVERSE', txt:'تفاصيل السبيكة'},
-    {end:1.0, micro:'MACRO', txt:'تفاصيل تُرى بوضوح.'}
-  ];
-  ScrollTrigger.create({
-    trigger:'#s5Stage', start:'top top', end:'bottom bottom', scrub:.4,
-    onUpdate:function(self){
-      var p = self.progress;
-      s5InRange = p > 0.04 && p < 0.96;
-      setOpacity(s5AltWrap, mapRange(p,.72,.85) * (1-mapRange(p,.94,1)));
-    }
-  });
-  v5.addEventListener('timeupdate', function(){
-    if (!s5InRange || !v5.duration) { setOpacity(s5Label,0); return; }
-    var t = v5.currentTime / v5.duration;
-    var cur = S5_LABELS[0];
-    for (var i=0;i<S5_LABELS.length;i++){ if (t <= S5_LABELS[i].end){ cur = S5_LABELS[i]; break; } }
-    var micro = s5Label.querySelector('.micro');
-    var txt = s5Label.querySelector('.txt');
-    if (micro.textContent !== cur.micro) micro.textContent = cur.micro;
-    if (txt.textContent !== cur.txt) txt.textContent = cur.txt;
-    var segStart = 0;
-    for (var j=0;j<S5_LABELS.length;j++){ if (S5_LABELS[j]===cur) break; segStart = S5_LABELS[j].end; }
-    var localT = mapRange(t, segStart, cur.end);
-    setOpacity(s5Label, mapRange(localT,0,.15) * (1-mapRange(localT,.85,1)));
-  });
-
-  /* ============ SCENE 6: live gold index reveal ============ */
-  ScrollTrigger.batch('#s6 [data-reveal]', {
-    start:'top 85%',
-    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.8, stagger:.15, ease:'power3.out'}); }
-  });
-
-  /* ============ SCENE 7: interlude reveal ============ */
-  gsap.to('#s7 h2, #s7 p', {
-    opacity:1, y:0, duration:.9, stagger:.15, ease:'power3.out',
-    scrollTrigger:{trigger:'#s7', start:'top 70%'}
-  });
-
-  /* ============ SCENE 9: brand values stagger ============ */
-  ScrollTrigger.batch('#s9Values span', {
-    start:'top 88%',
-    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.7, stagger:.15, ease:'power3.out'}); }
-  });
-
-  /* ============ SCENE 10: product rows reveal ============ */
-  ScrollTrigger.batch('.product-row', {
-    start:'top 90%',
-    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.7, stagger:.1, ease:'power3.out'}); }
-  });
+  /* ============ Section 2: product image parallax, 3-5% slower than scroll ============ */
+  var s2Product = document.querySelector('.s2-product');
+  if (s2Product){
+    gsap.to(s2Product, {
+      yPercent:-6, ease:'none',
+      scrollTrigger:{ trigger:'#s2', start:'top bottom', end:'bottom top', scrub:.6 }
+    });
+  }
 
 })();
