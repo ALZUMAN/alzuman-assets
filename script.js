@@ -137,6 +137,24 @@
     s2Lines.forEach(function(el){ el.classList.add('in'); });
   }
 
+  /* ============ Section 3: rotating micro-statements, one at a time while in view ============ */
+  var s3Cycler = document.getElementById('s3Cycler');
+  if (s3Cycler){
+    var s3Spans = Array.prototype.slice.call(s3Cycler.querySelectorAll('span'));
+    var s3Idx = 0, s3Timer = null;
+    function s3Show(i){
+      s3Spans.forEach(function(s,j){ s.classList.toggle('active', j === i); });
+    }
+    function s3Start(){ if (s3Timer || reduceMotion) return; s3Show(s3Idx); s3Timer = setInterval(function(){ s3Idx = (s3Idx+1) % s3Spans.length; s3Show(s3Idx); }, 2600); }
+    function s3Stop(){ clearInterval(s3Timer); s3Timer = null; }
+    if (reduceMotion){ s3Show(0); }
+    else if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ e.isIntersecting ? s3Start() : s3Stop(); });
+      }, {threshold:0.3}).observe(s3Cycler);
+    } else { s3Show(0); }
+  }
+
   if (reduceMotion || !window.gsap || !window.ScrollTrigger){ return; }
 
   gsap.registerPlugin(ScrollTrigger);
@@ -175,6 +193,15 @@
     gsap.to(s2Product, {
       yPercent:-6, ease:'none',
       scrollTrigger:{ trigger:'#s2', start:'top bottom', end:'bottom top', scrub:.6 }
+    });
+  }
+
+  /* ============ Section 5: hairline rule draws once on entry ============ */
+  var s5Rule = document.getElementById('s5Rule');
+  if (s5Rule){
+    gsap.to(s5Rule, {
+      scaleX:1, duration:.9, ease:'power2.out',
+      scrollTrigger:{ trigger:'#s5', start:'top 78%' }
     });
   }
 
