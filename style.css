@@ -1,11 +1,13 @@
 :root{
-  --bg-1:#F5F0E8;
-  --bg-2:#EEE6DA;
+  --bg-1:#F4EFE7;
+  --bg-2:#ECE4D8;
+  --bg-porcelain:#F8F5EF;
   --taupe:#81756F;
   --text-1:#211C18;
-  --text-2:#6C625B;
+  --text-2:#6A6059;
   --hairline:rgba(33,28,24,.14);
   --gold:#C7A24F;
+  --gold-soft:#D9C18B;
   --up:#67705F;
   --down:#8A6762;
   --ease-lux: cubic-bezier(.16,.84,.24,1);
@@ -81,34 +83,36 @@ a{color:inherit;}
 }
 
 /* ================= SCENE 1 — COLD OPEN ================= */
-.s1-inner{ position:relative; }
+.s1-bgsymbol{
+  position:absolute; z-index:0; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:100vw; max-width:640px; aspect-ratio:1; opacity:.04;
+  background-image:url('/assets/alzuman-logo.png'); background-repeat:no-repeat; background-position:center; background-size:contain;
+  filter:grayscale(1) contrast(0) brightness(.3); pointer-events:none;
+}
 .s1-video{ z-index:1; }
 .s1-logo{
-  position:absolute; z-index:3; left:50%; top:9vh; transform:translate(-50%,0);
-  width:26vw; max-width:110px; opacity:0;
+  position:absolute; z-index:3; left:50%; top:14vh; transform:translate(-50%,0);
+  width:44vw; max-width:190px; opacity:0;
 }
-.s1-headline{
-  position:absolute; z-index:3; left:6vw; top:19vh; opacity:0;
-  font-family:var(--font-kufi); font-weight:700; font-size:13vw; line-height:.95;
-}
-.s1-sub{ position:absolute; z-index:3; left:6vw; top:33vh; font-size:.85rem; color:var(--text-2); opacity:0; }
-.s1-tagline{
-  position:absolute; z-index:3; left:6vw; bottom:10vh; right:6vw;
-  font-family:var(--font-kufi); font-weight:600; font-size:8vw; opacity:0; line-height:1.1;
-}
+.s1-sub-micro{ position:absolute; z-index:3; left:0; right:0; bottom:14vh; text-align:center; opacity:0; }
+.s1-sub{ position:absolute; z-index:3; left:0; right:0; bottom:9vh; text-align:center; font-size:.9rem; color:var(--text-2); opacity:0; }
 
 /* ================= SCENE 2 — STATEMENT CYCLER ================= */
-.s2-inner{ padding:0 8vw; text-align:center; }
-.s2-cycler{ position:relative; height:5em; width:100%; }
+.s2-inner{ padding:0 8vw; text-align:right; }
+.s2-micro{ position:absolute; z-index:4; left:8vw; top:10vh; opacity:0; }
+.s2-video{
+  z-index:2; width:56vw; aspect-ratio:9/13;
+  position:absolute; left:8vw; bottom:-6vh; opacity:0;
+}
+.s2-cycler{ position:relative; z-index:1; height:5em; width:100%; }
 .s2-phrase{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-ar); font-weight:600; font-size:9vw; line-height:1.1;
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-end;
+  font-family:var(--font-ar); font-weight:600; font-size:12vw; line-height:1.02;
   opacity:0; clip-path:inset(0 0 100% 0);
 }
-.s2-final{ position:absolute; left:8vw; right:8vw; bottom:10vh; font-size:.88rem; color:var(--text-2); text-align:center; opacity:0; line-height:1.8; }
+.s2-final{ position:absolute; z-index:4; left:8vw; right:8vw; bottom:6vh; font-size:.88rem; color:var(--text-2); text-align:center; opacity:0; line-height:1.8; }
 
 /* ================= SCENE 3 — BULLION ARRIVES ================= */
-.s3-inner{ position:relative; }
 .s3-video{ z-index:1; }
 .s3-micro{ position:absolute; z-index:3; left:0; right:0; top:8vh; text-align:center; opacity:0; }
 .s3-headline{
@@ -117,7 +121,7 @@ a{color:inherit;}
 }
 
 /* ================= SCENE 4 — PURITY MACRO ================= */
-.s4-inner{ position:relative; background:#000; }
+.s4-inner{ background:#000; }
 .s4-video{ z-index:1; }
 .s4-annot{
   position:absolute; z-index:3; left:0; right:0; text-align:center; padding:0 8vw;
@@ -129,7 +133,6 @@ a{color:inherit;}
 .s4-annot .micro{ color:rgba(247,241,229,.72); }
 
 /* ================= SCENE 5 — INSPECTION ================= */
-.s5-inner{ position:relative; }
 .s5-video{ z-index:1; }
 .s5-alt-video{ z-index:2; opacity:0; box-shadow:0 30px 60px -20px rgba(33,28,24,.4); }
 .s5-label{
@@ -183,19 +186,6 @@ a{color:inherit;}
 .s7-section h2{ font-family:var(--font-kufi); font-weight:700; font-size:11vw; margin:0 0 1rem; opacity:0; transform:translateY(14px); }
 .s7-section p{ font-size:1rem; color:var(--text-2); opacity:0; transform:translateY(14px); }
 
-/* ================= SCENE 8 — HOW BUYING WORKS ================= */
-.s8-section{ padding:13vh 7vw; }
-.s8-head{ text-align:center; margin-bottom:8vh; }
-.s8-head h2{ font-family:var(--font-ar); font-weight:600; font-size:7vw; margin:0 0 1rem; }
-.s8-head p{ font-size:.88rem; color:var(--text-2); margin:0; }
-.s8-list{ max-width:34rem; margin:0 auto; border-top:1px solid var(--hairline); }
-.s8-item{
-  display:flex; align-items:center; gap:1.2rem; padding:1.8rem 0;
-  border-bottom:1px solid var(--hairline); opacity:0; transform:translateY(18px);
-}
-.s8-item .n{ font-family:var(--font-num); color:var(--gold); font-size:1rem; direction:ltr; flex:none; }
-.s8-item .t{ font-size:1rem; font-weight:500; }
-
 /* ================= SCENE 9 — BRAND STATEMENT ================= */
 .s9-section{ position:relative; background:var(--bg-2); padding:13vh 7vw; overflow:hidden; text-align:center; }
 .s9-bgsymbol{
@@ -246,10 +236,11 @@ a{color:inherit;}
 @media (prefers-reduced-motion: reduce){
   .pin-stage{ height:auto !important; }
   .pin-inner{ position:relative; height:auto; min-height:100svh; padding:8vh 0; }
-  .s1-logo,.s1-headline,.s1-sub,.s1-tagline,.s2-phrase,.s2-final,.s3-micro,.s3-headline,
+  .s1-logo,.s1-sub-micro,.s1-sub,.s2-micro,.s2-phrase,.s2-final,.s3-micro,.s3-headline,
   .s4-annot,.s5-label,.price-ounce-row,.price-grid,.s7-section h2,.s7-section p,
-  .s8-item,.s9-values span,.product-row{
+  .s9-values span,.product-row{
     opacity:1 !important; transform:none !important; clip-path:none !important; position:relative !important;
   }
   .mode-c{ position:relative; right:auto; top:auto; transform:none; width:80vw; margin:2rem auto; }
+  .s2-video{ position:relative; left:auto; bottom:auto; width:70vw; margin:2rem auto; opacity:1 !important; }
 }

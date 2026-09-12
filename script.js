@@ -108,9 +108,8 @@
 
   /* ============ SCENE 1: cold open ============ */
   var s1Logo = document.getElementById('s1Logo');
-  var s1Headline = document.getElementById('s1Headline');
   var s1Sub = document.getElementById('s1Sub');
-  var s1Tagline = document.getElementById('s1Tagline');
+  var s1SubMicro = document.getElementById('s1SubMicro');
   var s1VideoWrap = document.getElementById('s1VideoWrap');
   var headerMark = document.getElementById('headerMark');
 
@@ -118,11 +117,10 @@
     trigger:'#s1Stage', start:'top top', end:'bottom bottom', scrub:.4,
     onUpdate:function(self){
       var p = self.progress;
-      setOpacity(s1Logo, mapRange(p,.02,.08) * (1-mapRange(p,.55,.75)));
+      setOpacity(s1Logo, mapRange(p,.02,.1) * (1-mapRange(p,.55,.75)));
       s1Logo.style.transform = 'translate(-50%,0) translateY(' + (-p*10) + 'vh) scale(' + (1-p*.3) + ')';
-      setOpacity(s1Headline, mapRange(p,.05,.12) * (1-mapRange(p,.55,.75)));
-      setOpacity(s1Sub, mapRange(p,.08,.15) * (1-mapRange(p,.55,.75)));
-      setOpacity(s1Tagline, mapRange(p,.4,.5) * (1-mapRange(p,.8,.95)));
+      setOpacity(s1SubMicro, mapRange(p,.1,.18) * (1-mapRange(p,.55,.75)));
+      setOpacity(s1Sub, mapRange(p,.14,.22) * (1-mapRange(p,.55,.75)));
       var headerEase = ease('power2.inOut', mapRange(p,.6,.9));
       siteHeader.style.background = 'rgba(245,240,232,' + (headerEase*.9) + ')';
       headerMark.style.opacity = headerEase;
@@ -132,9 +130,11 @@
     }
   });
 
-  /* ============ SCENE 2: statement cycler ============ */
+  /* ============ SCENE 2: statement cycler + bullion crossing the type layer ============ */
   var s2Phrases = document.querySelectorAll('.s2-phrase');
   var s2Final = document.getElementById('s2Final');
+  var s2Micro = document.getElementById('s2Micro');
+  var s2VideoWrap = document.getElementById('s2VideoWrap');
   ScrollTrigger.create({
     trigger:'#s2Stage', start:'top top', end:'bottom bottom', scrub:.4,
     onUpdate:function(self){
@@ -150,7 +150,11 @@
         ph.style.clipPath = 'inset(0 0 ' + (100-inT*100) + '% 0)';
         ph.style.transform = 'translateY(' + ((1-inT)*18 - outT*12) + 'px)';
       });
+      setOpacity(s2Micro, mapRange(p,.03,.1) * (1-mapRange(p,.88,.97)));
       setOpacity(s2Final, mapRange(p,.85,.95));
+      var videoIn = mapRange(p,.08,.22);
+      s2VideoWrap.style.opacity = videoIn * (1-mapRange(p,.9,1));
+      s2VideoWrap.style.transform = 'translateY(' + ((1-videoIn)*8) + 'vh)';
     }
   });
 
@@ -227,12 +231,6 @@
   gsap.to('#s7 h2, #s7 p', {
     opacity:1, y:0, duration:.9, stagger:.15, ease:'power3.out',
     scrollTrigger:{trigger:'#s7', start:'top 70%'}
-  });
-
-  /* ============ SCENE 8: steps reveal ============ */
-  ScrollTrigger.batch('.s8-item', {
-    start:'top 88%',
-    onEnter:function(batch){ gsap.to(batch, {opacity:1, y:0, duration:.7, stagger:.12, ease:'power3.out'}); }
   });
 
   /* ============ SCENE 9: brand values stagger ============ */
